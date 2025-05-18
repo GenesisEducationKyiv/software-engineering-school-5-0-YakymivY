@@ -11,7 +11,7 @@ export class Subscription {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ nullable: false })
   email: string;
 
   @Column({ nullable: false })
@@ -24,10 +24,7 @@ export class Subscription {
   token: string;
 
   @Column({ default: false })
-  isVerified: boolean;
-
-  @Column({ default: false })
-  isActive: boolean;
+  confirmed: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

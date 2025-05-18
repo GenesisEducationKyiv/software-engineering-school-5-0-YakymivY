@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MailService } from './mail.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Frequency } from 'src/common/enums/frequency.enum';
 
 @Injectable()
 export class SubscriptionService {
@@ -26,11 +27,11 @@ export class SubscriptionService {
       const { email, city, frequency } = subscriptionDto;
 
       const existingEmail = await this.subscriptionRepository.findOne({
-        where: { email },
+        where: { email, city, frequency },
       });
 
       if (existingEmail) {
-        throw new ConflictException('Email already subscribed');
+        throw new ConflictException('Subscription already exists');
       }
 
       const token = uuidv4();
@@ -75,8 +76,7 @@ export class SubscriptionService {
         throw new NotFoundException('Subscription not found');
       }
 
-      subscription.isVerified = true;
-      subscription.isActive = true;
+      subscription.confirmed = true;
       await this.subscriptionRepository.save(subscription);
 
       return {
@@ -100,8 +100,7 @@ export class SubscriptionService {
         throw new NotFoundException('Subscription not found');
       }
 
-      subscription.isActive = false;
-      await this.subscriptionRepository.save(subscription);
+      await this.subscriptionRepository.remove(subscription);
 
       return {
         message: 'User unsubscribed successfully',
@@ -111,6 +110,23 @@ export class SubscriptionService {
         throw error;
       }
       throw new InternalServerErrorException('Failed to remove subscription');
+    }
+  }
+
+  async getActiveSubscriptions(frequency: Frequency) {
+    try {
+      const subscriptions = await this.subscriptionRepository.find({
+        where: { confirmed: true, frequency },
+      });
+
+      return subscriptions;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Failed to get active subscriptions',
+      );
     }
   }
 }
