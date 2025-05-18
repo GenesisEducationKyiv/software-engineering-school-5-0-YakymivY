@@ -28,15 +28,18 @@ export class SubscriptionService {
     try {
       const { email, city, frequency } = subscriptionDto;
 
+      // check if the subscription already exists
       const existingEmail = await this.subscriptionRepository.findOne({
-        where: { email, city, frequency },
+        where: { email },
       });
 
       if (existingEmail) {
-        throw new ConflictException('Subscription already exists');
+        throw new ConflictException('Email already subscribed');
       }
 
-      const token = uuidv4();
+      const token = uuidv4(); // generate a unique token
+
+      // create and save subscription
       const subscription = this.subscriptionRepository.create({
         email,
         city,
@@ -46,7 +49,9 @@ export class SubscriptionService {
 
       await this.subscriptionRepository.save(subscription);
 
-      const confirmUrl = `http://localhost:3000/api/confirm/${token}`;
+      // URL for email verification
+      const confirmUrl = `${process.env.BASE_URL}/confirm/${token}`;
+
       try {
         await this.mailService.sendMail(
           email,
@@ -58,7 +63,7 @@ export class SubscriptionService {
       }
 
       return {
-        message: 'Subscription created successfully',
+        message: 'Subscription successful. Confirmation email sent.',
       };
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -71,14 +76,16 @@ export class SubscriptionService {
 
   async confirmSubscription(token: string) {
     try {
+      // find the subscription
       const subscription = await this.subscriptionRepository.findOne({
         where: { token },
       });
 
       if (!subscription) {
-        throw new NotFoundException('Subscription not found');
+        throw new NotFoundException('Token not found');
       }
 
+      // change status to confirmed
       subscription.confirmed = true;
       await this.subscriptionRepository.save(subscription);
 
@@ -96,18 +103,20 @@ export class SubscriptionService {
 
   async removeSubscription(token: string) {
     try {
+      // find the subscription
       const subscription = await this.subscriptionRepository.findOne({
         where: { token },
       });
 
       if (!subscription) {
-        throw new NotFoundException('Subscription not found');
+        throw new NotFoundException('Token not found');
       }
 
+      // delete the subscription from db
       await this.subscriptionRepository.remove(subscription);
 
       return {
-        message: 'User unsubscribed successfully',
+        message: 'Unsubscribed successfully',
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -120,6 +129,7 @@ export class SubscriptionService {
 
   async getActiveSubscriptions(frequency: Frequency) {
     try {
+      // get all confirmed subscriptions with provided frequency
       const subscriptions = await this.subscriptionRepository.find({
         where: { confirmed: true, frequency },
       });
