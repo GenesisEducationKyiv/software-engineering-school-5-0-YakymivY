@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   ConflictException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { SubscriptionDto } from './dtos/subscription.dto';
 import { Subscription } from './entities/subscription.entity';
@@ -14,6 +15,7 @@ import { Frequency } from 'src/common/enums/frequency.enum';
 
 @Injectable()
 export class SubscriptionService {
+  private readonly logger = new Logger(SubscriptionService.name);
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
@@ -52,7 +54,7 @@ export class SubscriptionService {
           `<p>Thanks for subscribing!</p><p>Click the link below to confirm:</p><a href="${confirmUrl}">Confirm Subscription</a>`,
         );
       } catch (error) {
-        console.error('Error sending welcome email: ', error);
+        this.logger.error('Error sending welcome email: ', error);
       }
 
       return {
@@ -62,6 +64,7 @@ export class SubscriptionService {
       if (error instanceof ConflictException) {
         throw error;
       }
+      this.logger.error('Error creating subscription: ', error);
       throw new InternalServerErrorException('Failed to create subscription');
     }
   }
@@ -86,6 +89,7 @@ export class SubscriptionService {
       if (error instanceof NotFoundException) {
         throw error;
       }
+      this.logger.error('Error confirming subscription: ', error);
       throw new InternalServerErrorException('Failed to confirm subscription');
     }
   }
@@ -109,6 +113,7 @@ export class SubscriptionService {
       if (error instanceof NotFoundException) {
         throw error;
       }
+      this.logger.error('Error removing subscription: ', error);
       throw new InternalServerErrorException('Failed to remove subscription');
     }
   }
@@ -121,9 +126,7 @@ export class SubscriptionService {
 
       return subscriptions;
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
+      this.logger.error('Error getting active subscriptions: ', error);
       throw new InternalServerErrorException(
         'Failed to get active subscriptions',
       );

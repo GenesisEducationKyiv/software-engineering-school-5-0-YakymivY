@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class MailService {
   private readonly transporter: nodemailer.Transporter;
+  private readonly logger = new Logger(MailService.name);
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -18,11 +23,16 @@ export class MailService {
   }
 
   async sendMail(to: string, subject: string, html: string) {
-    await this.transporter.sendMail({
-      from: `"Weather App" <${process.env.MAIL_USER}>`,
-      to,
-      subject,
-      html,
-    });
+    try {
+      await this.transporter.sendMail({
+        from: `"Weather App" <${process.env.MAIL_USER}>`,
+        to,
+        subject,
+        html,
+      });
+    } catch (error) {
+      this.logger.error('Error sending mail: ', error);
+      throw new InternalServerErrorException('Failed to send mail');
+    }
   }
 }
