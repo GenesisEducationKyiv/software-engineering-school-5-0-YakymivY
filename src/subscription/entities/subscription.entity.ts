@@ -1,4 +1,4 @@
-import { Frequency } from 'src/common/enums/frequency.enum';
+import { Frequency } from '../../common/enums/frequency.enum';
 import {
   Entity,
   PrimaryGeneratedColumn,
