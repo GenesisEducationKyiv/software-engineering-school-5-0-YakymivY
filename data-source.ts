@@ -8,7 +8,7 @@ export default new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/migrations/*.js'],
+  entities: ['dist/src//**/*.entity.js'],
+  migrations: ['dist/src/migrations/*.js'],
   synchronize: false,
 });
