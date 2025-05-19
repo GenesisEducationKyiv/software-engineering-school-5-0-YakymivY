@@ -18,6 +18,10 @@ RUN npm install --only=production
 
 COPY --from=builder /app/dist ./dist
 
+COPY entrypoint.sh ./entrypoint.sh
+
+RUN chmod +x ./entrypoint.sh
+
 EXPOSE 3000
 
-CMD ["node", "dist/src/main"]
+ENTRYPOINT ["./entrypoint.sh"]
