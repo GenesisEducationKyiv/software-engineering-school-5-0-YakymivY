@@ -1,10 +1,11 @@
-import { Frequency } from '../../common/enums/frequency.enum';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
 } from 'typeorm';
+
+import { Frequency } from '../../common/enums/frequency.enum';
 
 @Entity()
 export class Subscription {

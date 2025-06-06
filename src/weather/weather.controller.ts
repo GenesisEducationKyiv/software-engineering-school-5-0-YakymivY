@@ -1,4 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
+
 import { WeatherResponse } from './interfaces/weather.interface';
 import { WeatherService } from './weather.service';
 import { CityDto } from './dtos/city.dto';

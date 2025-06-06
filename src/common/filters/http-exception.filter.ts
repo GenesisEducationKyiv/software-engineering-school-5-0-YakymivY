@@ -9,7 +9,7 @@ import { Request, Response } from 'express';
 
 @Catch()
 export class HttpExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -32,7 +32,7 @@ export class HttpExceptionsFilter implements ExceptionFilter {
       exceptionResponse !== null &&
       'message' in exceptionResponse
     ) {
-      message = (exceptionResponse as any).message;
+      message = exceptionResponse.message as string;
     }
 
     response.status(status).json({

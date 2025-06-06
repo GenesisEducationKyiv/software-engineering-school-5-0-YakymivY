@@ -6,9 +6,10 @@ import {
   Param,
   Get,
 } from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
+
 import { SubscriptionDto } from './dtos/subscription.dto';
 import { SubscriptionService } from './subscription.service';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { TokenDto } from './dtos/token.dto';
 @Controller('')
 export class SubscriptionController {
@@ -23,12 +24,14 @@ export class SubscriptionController {
   }
 
   @Get('confirm/:token')
-  async confirmSubscription(@Param() tokenDto: TokenDto) {
+  async confirmSubscription(
+    @Param() tokenDto: TokenDto,
+  ): Promise<{ message: string }> {
     return this.subscriptionService.confirmSubscription(tokenDto.token);
   }
 
   @Get('unsubscribe/:token')
-  async unsubscribe(@Param() tokenDto: TokenDto) {
+  async unsubscribe(@Param() tokenDto: TokenDto): Promise<{ message: string }> {
     return this.subscriptionService.removeSubscription(tokenDto.token);
   }
 }

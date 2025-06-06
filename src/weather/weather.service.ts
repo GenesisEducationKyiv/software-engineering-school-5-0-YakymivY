@@ -4,13 +4,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { lastValueFrom } from 'rxjs';
-import { WeatherResponse } from './interfaces/weather.interface';
-import { SubscriptionService } from 'src/subscription/subscription.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Frequency } from 'src/common/enums/frequency.enum';
-import { Subscription } from 'src/subscription/entities/subscription.entity';
-import { MailService } from 'src/subscription/mail.service';
+import { lastValueFrom } from 'rxjs';
+
+import { SubscriptionService } from '../subscription/subscription.service';
+import { MailService } from '../subscription/mail.service';
+import { Subscription } from '../subscription/entities/subscription.entity';
+import { Frequency } from '../common/enums/frequency.enum';
+
+import { WeatherResponse } from './interfaces/weather.interface';
+import { formEmailContent } from './utils/weather.utils';
+
 @Injectable()
 export class WeatherService {
   constructor(
@@ -20,7 +24,7 @@ export class WeatherService {
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
-  async sendHourlyUpdates() {
+  async sendHourlyUpdates(): Promise<void> {
     const subscriptions = await this.subscriptionService.getActiveSubscriptions(
       Frequency.HOURLY,
     );
@@ -28,20 +32,22 @@ export class WeatherService {
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_10AM)
-  async sendDailyUpdates() {
+  async sendDailyUpdates(): Promise<void> {
     const subscriptions = await this.subscriptionService.getActiveSubscriptions(
       Frequency.DAILY,
     );
     await this.sendScheduledEmails(subscriptions);
   }
 
-  private async sendScheduledEmails(subscriptions: Subscription[]) {
+  private async sendScheduledEmails(
+    subscriptions: Subscription[],
+  ): Promise<void> {
     for (const subscription of subscriptions) {
       const weather = await this.getWeather(subscription.city);
       await this.mailService.sendMail(
         subscription.email,
         'Weather Update',
-        this.formEmailContent(weather, subscription.city, subscription.token),
+        formEmailContent(weather, subscription.city, subscription.token),
       );
     }
   }
@@ -51,10 +57,17 @@ export class WeatherService {
       const apiKey = process.env.WEATHER_API_KEY;
       const url = `https://api.weatherapi.com/v1/current.json?q=${city}&key=${apiKey}`;
       const response = await lastValueFrom(this.httpService.get(url));
+      const data = response.data as {
+        current: {
+          temp_c: number;
+          humidity: number;
+          condition: { text: string };
+        };
+      };
       const weather: WeatherResponse = {
-        temperature: response.data.current.temp_c,
-        humidity: response.data.current.humidity,
-        description: response.data.current.condition.text,
+        temperature: data.current.temp_c,
+        humidity: data.current.humidity,
+        description: data.current.condition.text,
       };
       return weather;
     } catch (error) {
@@ -64,15 +77,5 @@ export class WeatherService {
         throw new BadRequestException(`Invalid request`);
       }
     }
-  }
-
-  private formEmailContent(
-    weather: WeatherResponse,
-    city: string,
-    token: string,
-  ) {
-    return `<p>The current weather in <b>${city}</b> is ${weather.description}
-            with a temperature of <b>${weather.temperature}°C</b> and a humidity of <b>${weather.humidity}%</b></p>
-            <p>Click <a href="${process.env.BASE_URL}/unsubscribe/${token}">here</a> to unsubscribe</p>`;
   }
 }

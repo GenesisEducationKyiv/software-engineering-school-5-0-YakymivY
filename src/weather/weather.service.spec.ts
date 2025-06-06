@@ -1,12 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WeatherService } from './weather.service';
 import { HttpService } from '@nestjs/axios';
-import { of, throwError } from 'rxjs';
-import { SubscriptionService } from 'src/subscription/subscription.service';
-import { MailService } from 'src/subscription/mail.service';
-import { Frequency } from 'src/common/enums/frequency.enum';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
-import { Subscription } from 'src/subscription/entities/subscription.entity';
+import { of, throwError } from 'rxjs';
+import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+
+import { SubscriptionService } from '../subscription/subscription.service';
+import { MailService } from '../subscription/mail.service';
+import { Frequency } from '../common/enums/frequency.enum';
+import { Subscription } from '../subscription/entities/subscription.entity';
+
+import { WeatherService } from './weather.service';
+import { WeatherResponse } from './interfaces/weather.interface';
+import { formEmailContent } from './utils/weather.utils';
 
 describe('WeatherService', () => {
   let service: WeatherService;
@@ -103,7 +108,7 @@ describe('WeatherService', () => {
     });
 
     it('should return formatted weather data on success', async () => {
-      const responseData = {
+      const responseData: AxiosResponse = {
         data: {
           current: {
             temp_c: 25,
@@ -111,8 +116,19 @@ describe('WeatherService', () => {
             condition: { text: 'Partly cloudy' },
           },
         },
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {
+          headers: {},
+          method: 'get',
+          url: '',
+          transformRequest: [],
+          transformResponse: [],
+          timeout: 0,
+        } as InternalAxiosRequestConfig,
       };
-      jest.spyOn(httpService, 'get').mockReturnValue(of(responseData as any));
+      jest.spyOn(httpService, 'get').mockReturnValue(of(responseData));
 
       const result = await service.getWeather('TestCity');
 
@@ -156,11 +172,14 @@ describe('WeatherService', () => {
   describe('formEmailContent', () => {
     it('should format the email content with weather info and unsubscribe link', () => {
       process.env.BASE_URL = 'http://localhost:3000/api';
-      const weather = { temperature: 10, humidity: 20, description: 'Rainy' };
+      const weather: WeatherResponse = {
+        temperature: 10,
+        humidity: 20,
+        description: 'Rainy',
+      };
       const city = 'CityX';
       const token = 'token123';
-
-      const content = (service as any).formEmailContent(weather, city, token);
+      const content = formEmailContent(weather, city, token);
 
       expect(content).toContain('The current weather in');
       expect(content).toContain('Rainy');

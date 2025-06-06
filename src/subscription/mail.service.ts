@@ -22,7 +22,7 @@ export class MailService {
     });
   }
 
-  async sendMail(to: string, subject: string, html: string) {
+  async sendMail(to: string, subject: string, html: string): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: `"Weather App" <${process.env.MAIL_USER}>`,
@@ -31,7 +31,7 @@ export class MailService {
         html,
       });
     } catch (error) {
-      this.logger.error('Error sending mail: ', error);
+      this.logger.error('Error sending mail: ', (error as Error).message);
       throw new InternalServerErrorException('Failed to send mail');
     }
   }
