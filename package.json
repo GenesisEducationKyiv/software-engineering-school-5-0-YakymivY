@@ -87,5 +87,9 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "ajv": "6.12.6",
+    "json-schema-traverse": "1.0.0"
   }
 }
