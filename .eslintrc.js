@@ -13,6 +13,7 @@ module.exports = {
     'plugin:import/warnings',
     'plugin:import/typescript',
     'plugin:prettier/recommended',
+    'prettier'
   ],
   root: true,
   env: {
@@ -50,10 +51,14 @@ module.exports = {
     '@typescript-eslint/naming-convention': [
       'error',
       {
-        selector: 'class',
+        selector: 'interface',
         format: ['PascalCase'],
         custom: { regex: '^I[A-Z]', match: false }, // Avoid "I" prefix for interfaces
       },
+      {
+        selector: 'class',
+        format: ['PascalCase'],
+      }
     ],
   },
 };
