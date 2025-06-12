@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { WeatherController } from './weather.controller';
 import { WeatherService } from './weather.service';
 import { WeatherResponse } from './interfaces/weather.interface';

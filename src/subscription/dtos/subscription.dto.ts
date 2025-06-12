@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, IsEnum } from 'class-validator';
-import { Frequency } from 'src/common/enums/frequency.enum';
+
+import { Frequency } from '../../common/enums/frequency.enum';
 
 export class SubscriptionDto {
   @IsNotEmpty()
