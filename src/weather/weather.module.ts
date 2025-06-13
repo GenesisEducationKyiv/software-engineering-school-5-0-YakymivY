@@ -16,6 +16,10 @@ import { WeatherController } from './controllers/weather.controller';
     },
   ],
   controllers: [WeatherController],
+<<<<<<< HEAD
   exports: ['WeatherApi'],
+=======
+  exports: [WeatherService],
+>>>>>>> c797021 (scheduled updates separated & folder structure changed)
 })
 export class WeatherModule {}

@@ -1,7 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+<<<<<<< HEAD
 import { WeatherResponse } from '../../weather/interfaces/weather.interface';
 import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
+=======
+import { WeatherService } from '../../weather/services/weather.service';
+import { WeatherResponse } from '../../weather/interfaces/weather.interface';
+>>>>>>> c797021 (scheduled updates separated & folder structure changed)
 
 import { WeatherController } from './weather.controller';
 
