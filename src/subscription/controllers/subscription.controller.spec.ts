@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { Frequency } from '../../common/enums/frequency.enum';
+import { SubscriptionService } from '../services/subscription.service';
+import { SubscriptionDto } from '../dtos/subscription.dto';
+import { TokenDto } from '../dtos/token.dto';
+
 import { SubscriptionController } from './subscription.controller';
-import { Frequency } from '../common/enums/frequency.enum';
-import { SubscriptionService } from './subscription.service';
-import { SubscriptionDto } from './dtos/subscription.dto';
-import { TokenDto } from './dtos/token.dto';
 
 describe('SubscriptionController', () => {
   let controller: SubscriptionController;
-  let service: SubscriptionService;
 
   const mockService = {
     createSubscription: jest.fn(),
@@ -27,7 +28,6 @@ describe('SubscriptionController', () => {
     }).compile();
 
     controller = module.get<SubscriptionController>(SubscriptionController);
-    service = module.get<SubscriptionService>(SubscriptionService);
   });
 
   afterEach(() => {
@@ -50,7 +50,7 @@ describe('SubscriptionController', () => {
 
       const result = await controller.createSubscription(dto);
       expect(result).toEqual(expectedResponse);
-      expect(service.createSubscription).toHaveBeenCalledWith(dto);
+      expect(mockService.createSubscription).toHaveBeenCalledWith(dto);
     });
   });
 
@@ -63,7 +63,7 @@ describe('SubscriptionController', () => {
 
       const result = await controller.confirmSubscription(dto);
       expect(result).toEqual(mockResponse);
-      expect(service.confirmSubscription).toHaveBeenCalledWith(dto.token);
+      expect(mockService.confirmSubscription).toHaveBeenCalledWith(dto.token);
     });
   });
 
@@ -76,7 +76,7 @@ describe('SubscriptionController', () => {
 
       const result = await controller.unsubscribe(dto);
       expect(result).toEqual(mockResponse);
-      expect(service.removeSubscription).toHaveBeenCalledWith(dto.token);
+      expect(mockService.removeSubscription).toHaveBeenCalledWith(dto.token);
     });
   });
 });

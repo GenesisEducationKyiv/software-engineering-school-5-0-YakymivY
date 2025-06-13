@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { WeatherService } from './weather.service';
-import { WeatherController } from './weather.controller';
 import { HttpModule } from '@nestjs/axios';
-import { SubscriptionModule } from 'src/subscription/subscription.module';
+
+import { SubscriptionModule } from '../subscription/subscription.module';
+
+import { WeatherService } from './services/weather.service';
+import { WeatherController } from './controllers/weather.controller';
 
 @Module({
   imports: [HttpModule, SubscriptionModule],
   providers: [WeatherService],
   controllers: [WeatherController],
+  exports: [WeatherService],
 })
 export class WeatherModule {}

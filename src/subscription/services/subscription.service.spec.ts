@@ -5,11 +5,13 @@ import {
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
-import { SubscriptionService } from './subscription.service';
-import { Subscription } from './entities/subscription.entity';
-import { MailService } from './mail.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Frequency } from 'src/common/enums/frequency.enum';
+
+import { Frequency } from '../../common/enums/frequency.enum';
+import { Subscription } from '../entities/subscription.entity';
+
+import { SubscriptionService } from './subscription.service';
+import { MailService } from './mail.service';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;

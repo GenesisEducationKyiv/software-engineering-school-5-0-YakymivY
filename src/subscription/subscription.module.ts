@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
-import { SubscriptionService } from './subscription.service';
-import { SubscriptionController } from './subscription.controller';
-import { Subscription } from './entities/subscription.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailService } from './mail.service';
+
+import { WeatherModule } from '../weather/weather.module';
+
+import { SubscriptionService } from './services/subscription.service';
+import { SubscriptionController } from './controllers/subscription.controller';
+import { Subscription } from './entities/subscription.entity';
+import { MailService } from './services/mail.service';
+import { ScheduledUpdatesService } from './services/scheduled-updates.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Subscription])],
-  providers: [SubscriptionService, MailService],
+  imports: [TypeOrmModule.forFeature([Subscription]), WeatherModule],
+  providers: [SubscriptionService, MailService, ScheduledUpdatesService],
   controllers: [SubscriptionController],
   exports: [MailService, SubscriptionService],
 })

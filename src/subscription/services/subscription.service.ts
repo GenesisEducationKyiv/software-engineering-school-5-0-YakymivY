@@ -5,13 +5,15 @@ import {
   NotFoundException,
   Logger,
 } from '@nestjs/common';
-import { SubscriptionDto } from './dtos/subscription.dto';
-import { Subscription } from './entities/subscription.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MailService } from './mail.service';
 import { v4 as uuidv4 } from 'uuid';
-import { Frequency } from 'src/common/enums/frequency.enum';
+
+import { Frequency } from '../../common/enums/frequency.enum';
+import { SubscriptionDto } from '../dtos/subscription.dto';
+import { Subscription } from '../entities/subscription.entity';
+
+import { MailService } from './mail.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -74,7 +76,7 @@ export class SubscriptionService {
     }
   }
 
-  async confirmSubscription(token: string) {
+  async confirmSubscription(token: string): Promise<{ message: string }> {
     try {
       // find the subscription
       const subscription = await this.subscriptionRepository.findOne({
@@ -101,7 +103,7 @@ export class SubscriptionService {
     }
   }
 
-  async removeSubscription(token: string) {
+  async removeSubscription(token: string): Promise<{ message: string }> {
     try {
       // find the subscription
       const subscription = await this.subscriptionRepository.findOne({
@@ -127,7 +129,7 @@ export class SubscriptionService {
     }
   }
 
-  async getActiveSubscriptions(frequency: Frequency) {
+  async getActiveSubscriptions(frequency: Frequency): Promise<Subscription[]> {
     try {
       // get all confirmed subscriptions with provided frequency
       const subscriptions = await this.subscriptionRepository.find({
