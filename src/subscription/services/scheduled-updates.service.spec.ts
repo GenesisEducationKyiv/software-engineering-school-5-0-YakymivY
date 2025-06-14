@@ -5,17 +5,23 @@ import { Frequency } from '../../common/enums/frequency.enum';
 =======
 import { formEmailContent } from '../../weather/utils/weather.utils';
 import { Frequency } from '../../common/enums/frequency.enum';
+<<<<<<< HEAD
 import { WeatherService } from '../../weather/services/weather.service';
 >>>>>>> c797021 (scheduled updates separated & folder structure changed)
+=======
+>>>>>>> dc12e32 (dependency inversion for mail and weather services)
 import { Subscription } from '../entities/subscription.entity';
 
 import { ScheduledUpdatesService } from './scheduled-updates.service';
 import { SubscriptionService } from './subscription.service';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { MailBuilderService } from './mail-builder.service';
 =======
 import { MailService } from './mail.service';
 >>>>>>> c797021 (scheduled updates separated & folder structure changed)
+=======
+>>>>>>> dc12e32 (dependency inversion for mail and weather services)
 
 jest.mock('../../weather/utils/weather.utils', () => ({
   formEmailContent: jest.fn(),
@@ -47,6 +53,7 @@ describe('ScheduledUpdatesService', () => {
         },
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
           provide: MailBuilderService,
           useValue: {
             sendWeatherUpdateEmail: mockSendWeatherUpdateEmail,
@@ -58,15 +65,22 @@ describe('ScheduledUpdatesService', () => {
             getCurrentWeather: mockGetWeather,
 =======
           provide: MailService,
+=======
+          provide: 'Mailer',
+>>>>>>> dc12e32 (dependency inversion for mail and weather services)
           useValue: {
             sendMail: mockSendMail,
           },
         },
         {
-          provide: WeatherService,
+          provide: 'WeatherApi',
           useValue: {
+<<<<<<< HEAD
             getWeather: mockGetWeather,
 >>>>>>> c797021 (scheduled updates separated & folder structure changed)
+=======
+            getCurrentWeather: mockGetWeather,
+>>>>>>> dc12e32 (dependency inversion for mail and weather services)
           },
         },
       ],

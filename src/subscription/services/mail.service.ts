@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 
 import { Mailer } from '../interfaces/mailer.interface';
 
+import { Mailer } from '../interfaces/mailer.interface';
+
 @Injectable()
 export class MailService implements Mailer {
   private readonly transporter: nodemailer.Transporter;

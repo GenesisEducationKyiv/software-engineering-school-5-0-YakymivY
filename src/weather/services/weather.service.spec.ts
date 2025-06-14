@@ -41,7 +41,7 @@ describe('WeatherService', () => {
     weatherService = module.get<WeatherApi>('WeatherApi');
   });
 
-  describe('getWeather', () => {
+  describe('getCurrentWeather', () => {
     beforeEach(() => {
       process.env.WEATHER_API_KEY = 'testkey';
     });

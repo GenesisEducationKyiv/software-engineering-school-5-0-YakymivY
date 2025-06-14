@@ -1,12 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { WeatherResponse } from '../../weather/interfaces/weather.interface';
 import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
 =======
 import { WeatherService } from '../../weather/services/weather.service';
 import { WeatherResponse } from '../../weather/interfaces/weather.interface';
 >>>>>>> c797021 (scheduled updates separated & folder structure changed)
+=======
+import { WeatherResponse } from '../../weather/interfaces/weather.interface';
+import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
+>>>>>>> dc12e32 (dependency inversion for mail and weather services)
 
 import { WeatherController } from './weather.controller';
 

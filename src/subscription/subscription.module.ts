@@ -24,7 +24,10 @@ import { MailBuilderService } from './services/mail-builder.service';
       provide: 'Mailer',
       useClass: MailService,
     },
+<<<<<<< HEAD
     MailBuilderService,
+=======
+>>>>>>> dc12e32 (dependency inversion for mail and weather services)
   ],
   controllers: [SubscriptionController],
   exports: [SubscriptionService, 'Mailer'],
