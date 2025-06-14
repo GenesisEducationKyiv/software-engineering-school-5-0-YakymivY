@@ -4,6 +4,7 @@ import {
   ConflictException,
   NotFoundException,
   Logger,
+  Inject,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,8 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Frequency } from '../../common/enums/frequency.enum';
 import { SubscriptionDto } from '../dtos/subscription.dto';
 import { Subscription } from '../entities/subscription.entity';
-
-import { MailService } from './mail.service';
+import { Mailer } from '../interfaces/mailer.interface';
 
 @Injectable()
 export class SubscriptionService {
@@ -21,7 +21,7 @@ export class SubscriptionService {
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-    private readonly mailService: MailService,
+    @Inject('Mailer') private readonly mailer: Mailer,
   ) {}
 
   async createSubscription(
@@ -55,7 +55,7 @@ export class SubscriptionService {
       const confirmUrl = `${process.env.BASE_URL}/confirm/${token}`;
 
       try {
-        await this.mailService.sendMail(
+        await this.mailer.sendMail(
           email,
           'Weather Subscription',
           `<p>Thanks for subscribing!</p><p>Click the link below to confirm:</p><a href="${confirmUrl}">Confirm Subscription</a>`,

@@ -6,29 +6,33 @@ import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 import { WeatherResponse } from '../interfaces/weather.interface';
 import { formEmailContent } from '../utils/weather.utils';
+import { WeatherApi } from '../interfaces/weather-api.interface';
 
 import { WeatherService } from './weather.service';
 
 describe('WeatherService', () => {
-  let service: WeatherService;
   let httpService: HttpService;
+  let weatherService: WeatherApi;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        WeatherService,
         {
           provide: HttpService,
           useValue: { get: jest.fn() },
         },
+        {
+          provide: 'WeatherApi',
+          useClass: WeatherService,
+        },
       ],
     }).compile();
 
-    service = module.get<WeatherService>(WeatherService);
     httpService = module.get<HttpService>(HttpService);
+    weatherService = module.get<WeatherApi>('WeatherApi');
   });
 
-  describe('getWeather', () => {
+  describe('getCurrentWeather', () => {
     beforeEach(() => {
       process.env.WEATHER_API_KEY = 'testkey';
     });
@@ -56,7 +60,7 @@ describe('WeatherService', () => {
       };
       jest.spyOn(httpService, 'get').mockReturnValue(of(responseData));
 
-      const result = await service.getWeather('TestCity');
+      const result = await weatherService.getCurrentWeather('TestCity');
 
       expect(httpService.get).toHaveBeenCalledWith(
         `https://api.weatherapi.com/v1/current.json?q=TestCity&key=testkey`,
@@ -76,9 +80,9 @@ describe('WeatherService', () => {
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => errorResponse));
 
-      await expect(service.getWeather('UnknownCity')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        weatherService.getCurrentWeather('UnknownCity'),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException on other errors', async () => {
@@ -89,7 +93,7 @@ describe('WeatherService', () => {
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => errorResponse));
 
-      await expect(service.getWeather('BadCity')).rejects.toThrow(
+      await expect(weatherService.getCurrentWeather('BadCity')).rejects.toThrow(
         BadRequestException,
       );
     });

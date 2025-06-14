@@ -1,15 +1,15 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Inject } from '@nestjs/common';
 
 import { WeatherResponse } from '../../weather/interfaces/weather.interface';
-import { WeatherService } from '../../weather/services/weather.service';
 import { CityDto } from '../../weather/dtos/city.dto';
+import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
 
 @Controller('weather')
 export class WeatherController {
-  constructor(private readonly weatherService: WeatherService) {}
+  constructor(@Inject('WeatherApi') private readonly weatherApi: WeatherApi) {}
 
   @Get()
   async getWeather(@Query() cityDto: CityDto): Promise<WeatherResponse> {
-    return this.weatherService.getWeather(cityDto.city);
+    return this.weatherApi.getCurrentWeather(cityDto.city);
   }
 }

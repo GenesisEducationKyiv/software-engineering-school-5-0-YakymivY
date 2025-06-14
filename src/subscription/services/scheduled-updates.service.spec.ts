@@ -2,12 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { formEmailContent } from '../../weather/utils/weather.utils';
 import { Frequency } from '../../common/enums/frequency.enum';
-import { WeatherService } from '../../weather/services/weather.service';
 import { Subscription } from '../entities/subscription.entity';
 
 import { ScheduledUpdatesService } from './scheduled-updates.service';
 import { SubscriptionService } from './subscription.service';
-import { MailService } from './mail.service';
 
 jest.mock('../../weather/utils/weather.utils', () => ({
   formEmailContent: jest.fn(),
@@ -33,15 +31,15 @@ describe('ScheduledUpdatesService', () => {
           },
         },
         {
-          provide: MailService,
+          provide: 'Mailer',
           useValue: {
             sendMail: mockSendMail,
           },
         },
         {
-          provide: WeatherService,
+          provide: 'WeatherApi',
           useValue: {
-            getWeather: mockGetWeather,
+            getCurrentWeather: mockGetWeather,
           },
         },
       ],

@@ -7,12 +7,13 @@ import {
 import { lastValueFrom } from 'rxjs';
 
 import { WeatherResponse } from '../interfaces/weather.interface';
+import { WeatherApi } from '../interfaces/weather-api.interface';
 
 @Injectable()
-export class WeatherService {
+export class WeatherService implements WeatherApi {
   constructor(private readonly httpService: HttpService) {}
 
-  async getWeather(city: string): Promise<WeatherResponse> {
+  async getCurrentWeather(city: string): Promise<WeatherResponse> {
     try {
       const apiKey = process.env.WEATHER_API_KEY;
       const url = `https://api.weatherapi.com/v1/current.json?q=${city}&key=${apiKey}`;

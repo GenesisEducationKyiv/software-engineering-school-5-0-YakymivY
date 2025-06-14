@@ -5,8 +5,10 @@ import {
 } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
+import { Mailer } from '../interfaces/mailer.interface';
+
 @Injectable()
-export class MailService {
+export class MailService implements Mailer {
   private readonly transporter: nodemailer.Transporter;
   private readonly logger = new Logger(MailService.name);
 

@@ -9,14 +9,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { Frequency } from '../../common/enums/frequency.enum';
 import { Subscription } from '../entities/subscription.entity';
+import { Mailer } from '../interfaces/mailer.interface';
 
 import { SubscriptionService } from './subscription.service';
-import { MailService } from './mail.service';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let repository: jest.Mocked<Repository<Subscription>>;
-  let mailService: jest.Mocked<MailService>;
+  let mailService: jest.Mocked<Mailer>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -35,13 +35,13 @@ describe('SubscriptionService', () => {
       providers: [
         SubscriptionService,
         { provide: getRepositoryToken(Subscription), useValue: mockRepository },
-        { provide: MailService, useValue: mockMailService },
+        { provide: 'Mailer', useValue: mockMailService },
       ],
     }).compile();
 
     service = module.get<SubscriptionService>(SubscriptionService);
     repository = module.get(getRepositoryToken(Subscription));
-    mailService = module.get(MailService);
+    mailService = module.get('Mailer');
   });
 
   describe('createSubscription', () => {

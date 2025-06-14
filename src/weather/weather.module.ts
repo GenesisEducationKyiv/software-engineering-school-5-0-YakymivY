@@ -8,8 +8,14 @@ import { WeatherController } from './controllers/weather.controller';
 
 @Module({
   imports: [HttpModule, SubscriptionModule],
-  providers: [WeatherService],
+  providers: [
+    WeatherService,
+    {
+      provide: 'WeatherApi',
+      useClass: WeatherService,
+    },
+  ],
   controllers: [WeatherController],
-  exports: [WeatherService],
+  exports: ['WeatherApi'],
 })
 export class WeatherModule {}
