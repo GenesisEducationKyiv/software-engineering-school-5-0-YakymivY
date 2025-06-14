@@ -1,15 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { WeatherResponse } from '../../weather/interfaces/weather.interface';
+import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
+
 import { WeatherController } from './weather.controller';
-import { WeatherService } from './weather.service';
-import { WeatherResponse } from './interfaces/weather.interface';
 
 describe('WeatherController', () => {
   let controller: WeatherController;
-  let weatherService: WeatherService;
+  let weatherService: WeatherApi;
 
   const mockWeatherService = {
-    getWeather: jest.fn(),
+    getCurrentWeather: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -17,14 +18,14 @@ describe('WeatherController', () => {
       controllers: [WeatherController],
       providers: [
         {
-          provide: WeatherService,
+          provide: 'WeatherApi',
           useValue: mockWeatherService,
         },
       ],
     }).compile();
 
     controller = module.get<WeatherController>(WeatherController);
-    weatherService = module.get<WeatherService>(WeatherService);
+    weatherService = module.get('WeatherApi');
   });
 
   it('should be defined', () => {
@@ -40,11 +41,13 @@ describe('WeatherController', () => {
         description: 'Cloudy',
       };
 
-      jest.spyOn(weatherService, 'getWeather').mockResolvedValue(mockWeather);
+      jest
+        .spyOn(weatherService, 'getCurrentWeather')
+        .mockResolvedValue(mockWeather);
 
       const result = await controller.getWeather(mockCityDto);
 
-      expect(weatherService.getWeather).toHaveBeenCalledWith('London');
+      expect(weatherService.getCurrentWeather).toHaveBeenCalledWith('London');
       expect(result).toEqual(mockWeather);
     });
   });
