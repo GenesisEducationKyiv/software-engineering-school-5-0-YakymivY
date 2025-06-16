@@ -24,11 +24,12 @@ import { SubscriptionModule } from './subscription/subscription.module';
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: process.env.NODE_ENV === 'test',
       }),
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({
+      envFilePath: `.env.${process.env.NODE_ENV}`,
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
