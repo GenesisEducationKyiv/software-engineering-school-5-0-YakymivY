@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
 
 import { Mailer } from '../interfaces/mailer.interface';
 
@@ -12,14 +13,14 @@ export class MailService implements Mailer {
   private readonly transporter: nodemailer.Transporter;
   private readonly logger = new Logger(MailService.name);
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: this.configService.getOrThrow<string>('MAIL_USER'),
+        pass: this.configService.getOrThrow<string>('MAIL_PASS'),
       },
     });
   }
@@ -27,7 +28,7 @@ export class MailService implements Mailer {
   async sendMail(to: string, subject: string, html: string): Promise<void> {
     try {
       await this.transporter.sendMail({
-        from: `"Weather App" <${process.env.MAIL_USER}>`,
+        from: `"Weather App" <${this.configService.getOrThrow<string>('MAIL_USER')}>`,
         to,
         subject,
         html,

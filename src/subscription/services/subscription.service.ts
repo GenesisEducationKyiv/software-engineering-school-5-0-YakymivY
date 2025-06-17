@@ -9,6 +9,7 @@ import {
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
 
 import { Frequency } from '../../common/enums/frequency.enum';
 import { SubscriptionDto } from '../dtos/subscription.dto';
@@ -22,6 +23,7 @@ export class SubscriptionService {
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
     @Inject('Mailer') private readonly mailer: Mailer,
+    private configService: ConfigService,
   ) {}
 
   async createSubscription(
@@ -52,7 +54,7 @@ export class SubscriptionService {
       await this.subscriptionRepository.save(subscription);
 
       // URL for email verification
-      const confirmUrl = `${process.env.BASE_URL}/confirm/${token}`;
+      const confirmUrl = `${this.configService.getOrThrow<string>('BASE_URL')}/confirm/${token}`;
 
       try {
         await this.mailer.sendMail(

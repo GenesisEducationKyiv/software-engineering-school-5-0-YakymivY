@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
 import { WeatherResponse } from '../interfaces/weather.interface';
@@ -11,11 +12,14 @@ import { WeatherApi } from '../interfaces/weather-api.interface';
 
 @Injectable()
 export class WeatherService implements WeatherApi {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private configService: ConfigService,
+  ) {}
 
   async getCurrentWeather(city: string): Promise<WeatherResponse> {
     try {
-      const apiKey = process.env.WEATHER_API_KEY;
+      const apiKey = this.configService.getOrThrow<string>('WEATHER_API_KEY');
       const url = `https://api.weatherapi.com/v1/current.json?q=${city}&key=${apiKey}`;
       const response = await lastValueFrom(this.httpService.get(url));
       const data = response.data as {
