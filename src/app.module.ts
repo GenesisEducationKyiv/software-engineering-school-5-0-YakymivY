@@ -33,7 +33,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', '..', 'public'),
       exclude: ['/api*'],
     }),
     WeatherModule,

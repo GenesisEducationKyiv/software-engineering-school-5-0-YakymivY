@@ -1,13 +1,26 @@
 services:
+  app:
+    build: .
+    command: sh -c "npm run migration:run && npm run start:prod"
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.test
+    depends_on:
+      - test_db
+    environment:
+      NODE_ENV: test
   test_db:
     image: postgres:15
     restart: always
+    env_file:
+      - .env.test
     ports:
-      - ${TEST_DB_PORT}:5432
+      - ${DB_PORT}:5432
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${TEST_DB_NAME}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - pg_test_data:/var/lib/postgresql/data
 
