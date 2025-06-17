@@ -51,7 +51,6 @@ describe('SubscriptionController', () => {
       const result = await controller.createSubscription(dto);
       expect(result).toEqual(expectedResponse);
       expect(mockService.createSubscription).toHaveBeenCalledWith(dto);
-      expect(mockService.createSubscription).toHaveBeenCalledWith(dto);
     });
   });
 
@@ -65,7 +64,6 @@ describe('SubscriptionController', () => {
       const result = await controller.confirmSubscription(dto);
       expect(result).toEqual(mockResponse);
       expect(mockService.confirmSubscription).toHaveBeenCalledWith(dto.token);
-      expect(mockService.confirmSubscription).toHaveBeenCalledWith(dto.token);
     });
   });
 
@@ -78,7 +76,6 @@ describe('SubscriptionController', () => {
 
       const result = await controller.unsubscribe(dto);
       expect(result).toEqual(mockResponse);
-      expect(mockService.removeSubscription).toHaveBeenCalledWith(dto.token);
       expect(mockService.removeSubscription).toHaveBeenCalledWith(dto.token);
     });
   });
