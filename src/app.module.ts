@@ -29,11 +29,11 @@ import { SubscriptionModule } from './subscription/subscription.module';
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'public'),
+      rootPath: join(__dirname, '..', 'public'),
       exclude: ['/api*'],
     }),
     WeatherModule,

@@ -23,6 +23,8 @@ test.describe('Static Page', () => {
     await page.selectOption('select[name="frequency"]', 'hourly');
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('pre')).toHaveText('Subscription successful');
+    await expect(page.locator('pre')).toHaveText(
+      '{\"message\":\"Subscription successful. Confirmation email sent.\"}',
+    );
   });
 });

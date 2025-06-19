@@ -69,6 +69,7 @@ describe('SubscriptionService', () => {
 
       repository.create.mockReturnValue(createdSubscription);
       repository.save.mockResolvedValue(createdSubscription);
+      mailBuilderService.sendConfirmationEmail.mockResolvedValue(undefined);
 
       const result = await service.createSubscription(subscriptionDto);
 

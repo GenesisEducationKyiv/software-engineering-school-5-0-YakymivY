@@ -42,10 +42,6 @@ describe('WeatherService', () => {
   });
 
   describe('getCurrentWeather', () => {
-    beforeEach(() => {
-      process.env.WEATHER_API_KEY = 'testkey';
-    });
-
     it('should return formatted weather data on success', async () => {
       const responseData: AxiosResponse = {
         data: {
@@ -72,7 +68,7 @@ describe('WeatherService', () => {
       const result = await weatherService.getCurrentWeather('TestCity');
 
       expect(httpService.get).toHaveBeenCalledWith(
-        `https://api.weatherapi.com/v1/current.json?q=TestCity&key=testkey`,
+        `https://api.weatherapi.com/v1/current.json?q=TestCity&key=${process.env.WEATHER_API_KEY}`,
       );
       expect(result).toEqual({
         temperature: 25,
