@@ -16,32 +16,56 @@ describe('Subscription API', () => {
   let subscriptionRepo: Repository<Subscription>;
 
   const VALID_SUBSCRIPTION_BODY = {
-    email: 'test@example.com',
+    email: 'test@gmail.com',
     city: 'Berlin',
     frequency: 'daily',
   };
 
-  async function createSubscription(): Promise<Subscription> {
+  async function waitForSubscription(
+    email: string,
+    timeout = 10000,
+  ): Promise<Subscription | null> {
+    const start = Date.now();
+    let result: Subscription | null = null;
+
+    while (Date.now() - start < timeout) {
+      result = await subscriptionRepo.findOneBy({ email });
+      if (result) return result;
+      await new Promise((res) => setTimeout(res, 100)); // wait 100ms
+    }
+
+    return null;
+  }
+
+  async function testCreateSubscription(code: number): Promise<Subscription> {
     await request(app.getHttpServer() as Server)
       .post('/api/subscribe')
       .send(VALID_SUBSCRIPTION_BODY)
-      .expect(201);
+      .expect(code);
 
-    return subscriptionRepo.findOneBy({
-      email: VALID_SUBSCRIPTION_BODY.email,
-    });
+    const subscription = await waitForSubscription(
+      VALID_SUBSCRIPTION_BODY.email,
+    );
+    if (!subscription) {
+      throw new Error('Subscription not found after waiting.');
+    }
+
+    return subscription;
   }
 
-  async function confirmSubscription(token: string): Promise<void> {
+  async function testConfirmSubscription(
+    token: string,
+    code: number,
+  ): Promise<void> {
     await request(app.getHttpServer() as Server)
       .get(`/api/confirm/${token}`)
-      .expect(200);
+      .expect(code);
   }
 
-  async function unsubscribe(token: string): Promise<void> {
+  async function testUnsubscribe(token: string, code: number): Promise<void> {
     await request(app.getHttpServer() as Server)
       .get(`/api/unsubscribe/${token}`)
-      .expect(200);
+      .expect(code);
   }
 
   beforeAll(async () => {
@@ -67,7 +91,7 @@ describe('Subscription API', () => {
   });
 
   it('POST /api/subscribe - should create a subscription', async () => {
-    const createdSubscription = await createSubscription();
+    const createdSubscription = await testCreateSubscription(201);
     expect(createdSubscription).toBeDefined();
     expect(createdSubscription.email).toBe(VALID_SUBSCRIPTION_BODY.email);
     expect(createdSubscription.city).toBe(VALID_SUBSCRIPTION_BODY.city);
@@ -98,12 +122,12 @@ describe('Subscription API', () => {
   });
 
   it('GET /api/confirm/:token - should confirm a subscription', async () => {
-    const createdSubscription = await createSubscription();
+    const createdSubscription = await testCreateSubscription(201);
 
     expect(createdSubscription).toBeDefined();
     expect(createdSubscription.confirmed).toBe(false);
 
-    await confirmSubscription(createdSubscription.token);
+    await testConfirmSubscription(createdSubscription.token, 200);
 
     const confirmedSubscription = await subscriptionRepo.findOneBy({
       email: VALID_SUBSCRIPTION_BODY.email,
@@ -112,13 +136,29 @@ describe('Subscription API', () => {
     expect(confirmedSubscription.confirmed).toBe(true);
   });
 
-  it('GET /api/unsubscribe/:token - should unsubscribe a subscription', async () => {
-    const createdSubscription = await createSubscription();
+  it('GET /api/confirm/:token - should return 404 for invalid token', async () => {
+    const createdSubscription = await testCreateSubscription(201);
 
     expect(createdSubscription).toBeDefined();
     expect(createdSubscription.confirmed).toBe(false);
 
-    await confirmSubscription(createdSubscription.token);
+    const invalidToken = '550e8400-e29b-41d4-a716-446655440000';
+    await testConfirmSubscription(invalidToken, 404);
+
+    const confirmedSubscription = await subscriptionRepo.findOneBy({
+      email: createdSubscription.email,
+    });
+    expect(confirmedSubscription).toBeDefined();
+    expect(confirmedSubscription.confirmed).toBe(false);
+  });
+
+  it('GET /api/unsubscribe/:token - should unsubscribe a subscription', async () => {
+    const createdSubscription = await testCreateSubscription(201);
+
+    expect(createdSubscription).toBeDefined();
+    expect(createdSubscription.confirmed).toBe(false);
+
+    await testConfirmSubscription(createdSubscription.token, 200);
 
     const confirmedSubscription = await subscriptionRepo.findOneBy({
       email: VALID_SUBSCRIPTION_BODY.email,
@@ -126,11 +166,35 @@ describe('Subscription API', () => {
     expect(confirmedSubscription).toBeDefined();
     expect(confirmedSubscription.confirmed).toBe(true);
 
-    await unsubscribe(confirmedSubscription.token);
+    await testUnsubscribe(confirmedSubscription.token, 200);
 
     const unsubscribedSubscription = await subscriptionRepo.findOneBy({
       email: VALID_SUBSCRIPTION_BODY.email,
     });
     expect(unsubscribedSubscription).toBeNull();
+  });
+
+  it('GET /api/unsubscribe/:token - should return 404 for invalid token', async () => {
+    const createdSubscription = await testCreateSubscription(201);
+
+    expect(createdSubscription).toBeDefined();
+    expect(createdSubscription.confirmed).toBe(false);
+
+    await testConfirmSubscription(createdSubscription.token, 200);
+
+    const confirmedSubscription = await subscriptionRepo.findOneBy({
+      email: VALID_SUBSCRIPTION_BODY.email,
+    });
+    expect(confirmedSubscription).toBeDefined();
+    expect(confirmedSubscription.confirmed).toBe(true);
+
+    const invalidToken = '550e8400-e29b-41d4-a716-446655440000';
+    await testUnsubscribe(invalidToken, 404);
+
+    const unsubscribedSubscription = await subscriptionRepo.findOneBy({
+      email: VALID_SUBSCRIPTION_BODY.email,
+    });
+    expect(unsubscribedSubscription).toBeDefined();
+    expect(unsubscribedSubscription.confirmed).toBe(true);
   });
 });

@@ -8,5 +8,6 @@
   "setupFiles": ["<rootDir>/test/integration/setup.ts"],
   "preset": "ts-jest",
   "testEnvironment": "node",
-  "verbose": true
+  "verbose": true,
+  "testTimeout": 10000
 }

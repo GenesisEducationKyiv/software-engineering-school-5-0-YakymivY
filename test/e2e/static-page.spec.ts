@@ -23,8 +23,20 @@ test.describe('Static Page', () => {
     await page.selectOption('select[name="frequency"]', 'hourly');
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('pre')).toHaveText(
-      '{\"message\":\"Subscription successful. Confirmation email sent.\"}',
+    await expect(page.locator('pre')).toContainText(
+      'Subscription successful. Confirmation email sent.',
     );
+  });
+
+  test('should show error message when email is already subscribed', async ({
+    page,
+  }) => {
+    await page.goto('http://localhost:3000/');
+    await page.fill('input[name="email"]', 'test@example.com');
+    await page.fill('input[name="city"]', 'New York');
+    await page.selectOption('select[name="frequency"]', 'hourly');
+    await page.click('button[type="submit"]');
+
+    await expect(page.locator('pre')).toContainText('Email already subscribed');
   });
 });

@@ -17,10 +17,6 @@ services:
       - .env.test
     ports:
       - ${DB_PORT}:5432
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
     volumes:
       - pg_test_data:/var/lib/postgresql/data
 
