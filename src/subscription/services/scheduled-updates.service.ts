@@ -1,20 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
-import { formEmailContent } from '../../weather/utils/weather.utils';
 import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
 import { Frequency } from '../../common/enums/frequency.enum';
 import { Subscription } from '../entities/subscription.entity';
-import { Mailer } from '../interfaces/mailer.interface';
 
+import { MailBuilderService } from './mail-builder.service';
 import { SubscriptionService } from './subscription.service';
 
 @Injectable()
 export class ScheduledUpdatesService {
   constructor(
     private readonly subscriptionService: SubscriptionService,
-    @Inject('Mailer') private readonly mailer: Mailer,
     @Inject('WeatherApi') private readonly weatherApi: WeatherApi,
+    private readonly mailBuilderService: MailBuilderService,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -38,10 +37,9 @@ export class ScheduledUpdatesService {
       const weather = await this.weatherApi.getCurrentWeather(
         subscription.city,
       );
-      await this.mailer.sendMail(
-        subscription.email,
-        'Weather Update',
-        formEmailContent(weather, subscription.city, subscription.token),
+      await this.mailBuilderService.sendWeatherUpdateEmail(
+        weather,
+        subscription,
       );
     }
   }

@@ -9,6 +9,7 @@ import { SubscriptionController } from './controllers/subscription.controller';
 import { Subscription } from './entities/subscription.entity';
 import { MailService } from './services/mail.service';
 import { ScheduledUpdatesService } from './services/scheduled-updates.service';
+import { MailBuilderService } from './services/mail-builder.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Subscription]), WeatherModule],
@@ -23,6 +24,7 @@ import { ScheduledUpdatesService } from './services/scheduled-updates.service';
       provide: 'Mailer',
       useClass: MailService,
     },
+    MailBuilderService,
   ],
   controllers: [SubscriptionController],
   exports: [SubscriptionService, 'Mailer'],

@@ -4,7 +4,6 @@ import {
   ConflictException,
   NotFoundException,
   Logger,
-  Inject,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +13,8 @@ import { ConfigService } from '@nestjs/config';
 import { Frequency } from '../../common/enums/frequency.enum';
 import { SubscriptionDto } from '../dtos/subscription.dto';
 import { Subscription } from '../entities/subscription.entity';
-import { Mailer } from '../interfaces/mailer.interface';
+
+import { MailBuilderService } from './mail-builder.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -24,7 +24,7 @@ export class SubscriptionService {
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-    @Inject('Mailer') private readonly mailer: Mailer,
+    private readonly mailBuilderService: MailBuilderService,
     private configService: ConfigService,
   ) {
     this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
@@ -61,18 +61,7 @@ export class SubscriptionService {
 
       await this.subscriptionRepository.save(subscription);
 
-      // URL for email verification
-      const confirmUrl = `${this.baseUrl}/confirm/${token}`;
-
-      try {
-        await this.mailer.sendMail(
-          email,
-          'Weather Subscription',
-          `<p>Thanks for subscribing!</p><p>Click the link below to confirm:</p><a href="${confirmUrl}">Confirm Subscription</a>`,
-        );
-      } catch (error) {
-        this.logger.error('Error sending welcome email: ', error);
-      }
+      await this.mailBuilderService.sendConfirmationEmail(email, token);
 
       return {
         message: 'Subscription successful. Confirmation email sent.',

@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { formEmailContent } from '../../weather/utils/weather.utils';
 import { Frequency } from '../../common/enums/frequency.enum';
 import { Subscription } from '../entities/subscription.entity';
 
 import { ScheduledUpdatesService } from './scheduled-updates.service';
 import { SubscriptionService } from './subscription.service';
+import { MailBuilderService } from './mail-builder.service';
 
 jest.mock('../../weather/utils/weather.utils', () => ({
   formEmailContent: jest.fn(),
@@ -15,9 +15,8 @@ describe('ScheduledUpdatesService', () => {
   let service: ScheduledUpdatesService;
 
   const mockGetActiveSubscriptions = jest.fn();
-  const mockSendMail = jest.fn();
+  const mockSendWeatherUpdateEmail = jest.fn();
   const mockGetWeather = jest.fn();
-  const mockFormEmailContent = formEmailContent as jest.Mock;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -31,9 +30,9 @@ describe('ScheduledUpdatesService', () => {
           },
         },
         {
-          provide: 'Mailer',
+          provide: MailBuilderService,
           useValue: {
-            sendMail: mockSendMail,
+            sendWeatherUpdateEmail: mockSendWeatherUpdateEmail,
           },
         },
         {
@@ -58,21 +57,22 @@ describe('ScheduledUpdatesService', () => {
         } as Subscription,
       ];
       mockGetActiveSubscriptions.mockResolvedValue(subs);
-      mockSendMail.mockResolvedValue(undefined);
       mockGetWeather.mockResolvedValue({
         temperature: 25,
         humidity: 55,
         description: 'Partly cloudy',
       });
-      mockFormEmailContent.mockReturnValue('Email content with Partly cloudy');
 
       await service.sendHourlyUpdates();
 
       expect(mockGetActiveSubscriptions).toHaveBeenCalledWith(Frequency.HOURLY);
-      expect(mockSendMail).toHaveBeenCalledWith(
-        'a@example.com',
-        'Weather Update',
-        'Email content with Partly cloudy',
+      expect(mockSendWeatherUpdateEmail).toHaveBeenCalledWith(
+        {
+          temperature: 25,
+          humidity: 55,
+          description: 'Partly cloudy',
+        },
+        subs[0],
       );
     });
   });
@@ -87,21 +87,22 @@ describe('ScheduledUpdatesService', () => {
         } as Subscription,
       ];
       mockGetActiveSubscriptions.mockResolvedValue(subs);
-      mockSendMail.mockResolvedValue(undefined);
       mockGetWeather.mockResolvedValue({
         temperature: 15,
         humidity: 65,
         description: 'Cloudy',
       });
-      mockFormEmailContent.mockReturnValue('Email content with Cloudy');
 
       await service.sendDailyUpdates();
 
       expect(mockGetActiveSubscriptions).toHaveBeenCalledWith(Frequency.DAILY);
-      expect(mockSendMail).toHaveBeenCalledWith(
-        'b@example.com',
-        'Weather Update',
-        'Email content with Cloudy',
+      expect(mockSendWeatherUpdateEmail).toHaveBeenCalledWith(
+        {
+          temperature: 15,
+          humidity: 65,
+          description: 'Cloudy',
+        },
+        subs[0],
       );
     });
   });

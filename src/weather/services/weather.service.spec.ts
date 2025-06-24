@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { of, throwError } from 'rxjs';
 import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
+import { WeatherApi } from '../interfaces/weather-api.interface';
 import { WeatherResponse } from '../interfaces/weather.interface';
 import { formEmailContent } from '../utils/weather.utils';
-import { WeatherApi } from '../interfaces/weather-api.interface';
 
 import { WeatherService } from './weather.service';
 
@@ -15,6 +16,10 @@ describe('WeatherService', () => {
   let weatherService: WeatherApi;
 
   beforeEach(async () => {
+    const mockConfigService = {
+      getOrThrow: jest.fn().mockReturnValue('testkey'),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
@@ -25,6 +30,10 @@ describe('WeatherService', () => {
           provide: 'WeatherApi',
           useClass: WeatherService,
         },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
       ],
     }).compile();
 
@@ -33,10 +42,6 @@ describe('WeatherService', () => {
   });
 
   describe('getCurrentWeather', () => {
-    beforeEach(() => {
-      process.env.WEATHER_API_KEY = 'testkey';
-    });
-
     it('should return formatted weather data on success', async () => {
       const responseData: AxiosResponse = {
         data: {
