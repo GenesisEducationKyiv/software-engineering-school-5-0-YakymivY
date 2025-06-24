@@ -14,6 +14,10 @@ import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule, ScheduleModule.forRoot()],
       useFactory: (configService: ConfigService) => ({
@@ -27,10 +31,6 @@ import { SubscriptionModule } from './subscription/subscription.module';
         synchronize: process.env.NODE_ENV === 'test',
       }),
       inject: [ConfigService],
-    }),
-    ConfigModule.forRoot({
-      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-      isGlobal: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),

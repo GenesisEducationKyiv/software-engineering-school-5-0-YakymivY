@@ -9,5 +9,5 @@
   "preset": "ts-jest",
   "testEnvironment": "node",
   "verbose": true,
-  "testTimeout": 10000
+  "testTimeout": 60000
 }

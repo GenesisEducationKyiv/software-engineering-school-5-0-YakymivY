@@ -12,6 +12,7 @@ const config: Config = {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
   testEnvironment: 'node',
+  setupFiles: ['../jest.setup.ts'],
 };
 
 export default config;
