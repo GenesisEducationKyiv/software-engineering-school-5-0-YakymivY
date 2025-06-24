@@ -8,9 +8,9 @@ import {
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
-import { SubscriptionDto } from './dtos/subscription.dto';
-import { SubscriptionService } from './subscription.service';
-import { TokenDto } from './dtos/token.dto';
+import { SubscriptionDto } from '../dtos/subscription.dto';
+import { SubscriptionService } from '../services/subscription.service';
+import { TokenDto } from '../dtos/token.dto';
 @Controller('')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}

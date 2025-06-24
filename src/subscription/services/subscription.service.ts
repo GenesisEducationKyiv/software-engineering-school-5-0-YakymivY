@@ -8,21 +8,31 @@ import {
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
 
-import { Frequency } from '../common/enums/frequency.enum';
+import { Frequency } from '../../common/enums/frequency.enum';
+import { SubscriptionDto } from '../dtos/subscription.dto';
+import { Subscription } from '../entities/subscription.entity';
 
-import { SubscriptionDto } from './dtos/subscription.dto';
-import { Subscription } from './entities/subscription.entity';
-import { MailService } from './mail.service';
+import { MailBuilderService } from './mail-builder.service';
 
 @Injectable()
 export class SubscriptionService {
   private readonly logger = new Logger(SubscriptionService.name);
+  private readonly baseUrl: string;
+
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-    private readonly mailService: MailService,
-  ) {}
+    private readonly mailBuilderService: MailBuilderService,
+    private configService: ConfigService,
+  ) {
+    this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
+
+    if (!this.baseUrl) {
+      throw new Error('Missing BASE_URL environment variable');
+    }
+  }
 
   async createSubscription(
     subscriptionDto: SubscriptionDto,
@@ -51,18 +61,7 @@ export class SubscriptionService {
 
       await this.subscriptionRepository.save(subscription);
 
-      // URL for email verification
-      const confirmUrl = `${process.env.BASE_URL}/confirm/${token}`;
-
-      try {
-        await this.mailService.sendMail(
-          email,
-          'Weather Subscription',
-          `<p>Thanks for subscribing!</p><p>Click the link below to confirm:</p><a href="${confirmUrl}">Confirm Subscription</a>`,
-        );
-      } catch (error) {
-        this.logger.error('Error sending welcome email: ', error);
-      }
+      await this.mailBuilderService.sendConfirmationEmail(email, token);
 
       return {
         message: 'Subscription successful. Confirmation email sent.',

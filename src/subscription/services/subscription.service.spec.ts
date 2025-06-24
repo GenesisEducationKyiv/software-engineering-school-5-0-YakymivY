@@ -6,17 +6,18 @@ import {
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 
-import { Frequency } from '../common/enums/frequency.enum';
+import { Frequency } from '../../common/enums/frequency.enum';
+import { Subscription } from '../entities/subscription.entity';
 
+import { MailBuilderService } from './mail-builder.service';
 import { SubscriptionService } from './subscription.service';
-import { Subscription } from './entities/subscription.entity';
-import { MailService } from './mail.service';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let repository: jest.Mocked<Repository<Subscription>>;
-  let mailService: jest.Mocked<MailService>;
+  let mailBuilderService: jest.Mocked<MailBuilderService>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -28,20 +29,25 @@ describe('SubscriptionService', () => {
     };
 
     const mockMailService = {
-      sendMail: jest.fn(),
+      sendConfirmationEmail: jest.fn(),
+    };
+
+    const mockConfigService = {
+      getOrThrow: jest.fn().mockReturnValue('http://localhost:3000'),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubscriptionService,
         { provide: getRepositoryToken(Subscription), useValue: mockRepository },
-        { provide: MailService, useValue: mockMailService },
+        { provide: MailBuilderService, useValue: mockMailService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     service = module.get<SubscriptionService>(SubscriptionService);
     repository = module.get(getRepositoryToken(Subscription));
-    mailService = module.get(MailService);
+    mailBuilderService = module.get(MailBuilderService);
   });
 
   describe('createSubscription', () => {
@@ -53,37 +59,34 @@ describe('SubscriptionService', () => {
 
     it('should create subscription and send confirmation email', async () => {
       repository.findOne.mockResolvedValue(null);
+
       const createdSubscription = {
-        id: '1',
         ...subscriptionDto,
         token: 'uuid-token',
         confirmed: false,
         createdAt: new Date(),
-      };
+      } as Subscription;
+
       repository.create.mockReturnValue(createdSubscription);
       repository.save.mockResolvedValue(createdSubscription);
-      mailService.sendMail.mockResolvedValue(undefined);
-      process.env.BASE_URL = 'http://localhost:3000/api';
 
       const result = await service.createSubscription(subscriptionDto);
 
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { email: subscriptionDto.email },
       });
-      expect(repository.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          email: subscriptionDto.email,
-          city: subscriptionDto.city,
-          frequency: subscriptionDto.frequency,
-          token: expect.any(String),
-        }),
-      );
+
+      expect(repository.create).toHaveBeenCalledWith({
+        email: subscriptionDto.email,
+        city: subscriptionDto.city,
+        frequency: subscriptionDto.frequency,
+        token: expect.any(String),
+      });
+
       expect(repository.save).toHaveBeenCalledWith(createdSubscription);
-      expect(mailService.sendMail).toHaveBeenCalledWith(
-        subscriptionDto.email,
-        'Weather Subscription',
-        expect.stringContaining(`${process.env.BASE_URL}/confirm/`),
-      );
+
+      expect(mailBuilderService.sendConfirmationEmail).toHaveBeenCalled();
+
       expect(result).toEqual({
         message: 'Subscription successful. Confirmation email sent.',
       });
@@ -95,7 +98,7 @@ describe('SubscriptionService', () => {
         email: subscriptionDto.email,
         city: subscriptionDto.city,
         frequency: subscriptionDto.frequency,
-        token: 'uuid-token',
+        token: 'existing-token',
         confirmed: false,
         createdAt: new Date(),
       });

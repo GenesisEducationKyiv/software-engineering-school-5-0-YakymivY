@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { Frequency } from '../common/enums/frequency.enum';
+import { Frequency } from '../../common/enums/frequency.enum';
+import { SubscriptionService } from '../services/subscription.service';
+import { SubscriptionDto } from '../dtos/subscription.dto';
+import { TokenDto } from '../dtos/token.dto';
 
 import { SubscriptionController } from './subscription.controller';
-import { SubscriptionService } from './subscription.service';
-import { SubscriptionDto } from './dtos/subscription.dto';
-import { TokenDto } from './dtos/token.dto';
 
 describe('SubscriptionController', () => {
   let controller: SubscriptionController;

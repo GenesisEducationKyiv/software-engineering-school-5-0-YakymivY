@@ -4,20 +4,32 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
+import { ConfigService } from '@nestjs/config';
+
+import { Mailer } from '../interfaces/mailer.interface';
 
 @Injectable()
-export class MailService {
+export class MailService implements Mailer {
   private readonly transporter: nodemailer.Transporter;
   private readonly logger = new Logger(MailService.name);
+  private readonly mailUser: string;
+  private readonly mailPass: string;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
+    this.mailUser = this.configService.getOrThrow<string>('MAIL_USER');
+    this.mailPass = this.configService.getOrThrow<string>('MAIL_PASS');
+
+    if (!this.mailUser || !this.mailPass) {
+      throw new Error('Missing MAIL_USER or MAIL_PASS environment variable');
+    }
+
     this.transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
+        user: this.mailUser,
+        pass: this.mailPass,
       },
     });
   }
@@ -25,7 +37,7 @@ export class MailService {
   async sendMail(to: string, subject: string, html: string): Promise<void> {
     try {
       await this.transporter.sendMail({
-        from: `"Weather App" <${process.env.MAIL_USER}>`,
+        from: `"Weather App" <${this.mailUser}>`,
         to,
         subject,
         html,
