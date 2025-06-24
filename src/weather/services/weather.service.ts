@@ -12,15 +12,23 @@ import { WeatherApi } from '../interfaces/weather-api.interface';
 
 @Injectable()
 export class WeatherService implements WeatherApi {
+  private readonly weatherApiKey: string;
+
   constructor(
     private readonly httpService: HttpService,
     private configService: ConfigService,
-  ) {}
+  ) {
+    this.weatherApiKey =
+      this.configService.getOrThrow<string>('WEATHER_API_KEY');
+
+    if (!this.weatherApiKey) {
+      throw new Error('Missing WEATHER_API_KEY environment variable');
+    }
+  }
 
   async getCurrentWeather(city: string): Promise<WeatherResponse> {
     try {
-      const apiKey = this.configService.getOrThrow<string>('WEATHER_API_KEY');
-      const url = `https://api.weatherapi.com/v1/current.json?q=${city}&key=${apiKey}`;
+      const url = `https://api.weatherapi.com/v1/current.json?q=${city}&key=${this.weatherApiKey}`;
       const response = await lastValueFrom(this.httpService.get(url));
       const data = response.data as {
         current: {

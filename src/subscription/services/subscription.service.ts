@@ -19,12 +19,20 @@ import { Mailer } from '../interfaces/mailer.interface';
 @Injectable()
 export class SubscriptionService {
   private readonly logger = new Logger(SubscriptionService.name);
+  private readonly baseUrl: string;
+
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
     @Inject('Mailer') private readonly mailer: Mailer,
     private configService: ConfigService,
-  ) {}
+  ) {
+    this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
+
+    if (!this.baseUrl) {
+      throw new Error('Missing BASE_URL environment variable');
+    }
+  }
 
   async createSubscription(
     subscriptionDto: SubscriptionDto,
@@ -54,7 +62,7 @@ export class SubscriptionService {
       await this.subscriptionRepository.save(subscription);
 
       // URL for email verification
-      const confirmUrl = `${this.configService.getOrThrow<string>('BASE_URL')}/confirm/${token}`;
+      const confirmUrl = `${this.baseUrl}/confirm/${token}`;
 
       try {
         await this.mailer.sendMail(
