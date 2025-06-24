@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { InternalServerErrorException } from '@nestjs/common';
 
@@ -11,10 +12,19 @@ describe('MailService', () => {
 
   const sendMailMock = jest.fn();
 
+  const mockTransporter = {
+    sendMail: sendMailMock,
+  };
+
+  const mockConfigService = {
+    getOrThrow: jest.fn((key: string) => {
+      if (key === 'MAIL_USER') return 'weather@app.com';
+      if (key === 'MAIL_PASS') return 'securepass';
+    }),
+  };
+
   beforeEach(async () => {
-    const mockConfigService = {
-      getOrThrow: jest.fn().mockReturnValue('http://localhost:3000'),
-    };
+    (nodemailer.createTransport as jest.Mock).mockReturnValue(mockTransporter);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -33,6 +43,10 @@ describe('MailService', () => {
     jest.clearAllMocks();
   });
 
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
   it('should send email successfully', async () => {
     sendMailMock.mockResolvedValueOnce(true);
 
@@ -41,7 +55,7 @@ describe('MailService', () => {
     ).resolves.toBeUndefined();
 
     expect(sendMailMock).toHaveBeenCalledWith({
-      from: `"Weather App" <${process.env.MAIL_USER}>`,
+      from: `"Weather App" <weather@app.com>`,
       to: 'test@example.com',
       subject: 'Test Subject',
       html: '<p>Hello</p>',
@@ -56,9 +70,5 @@ describe('MailService', () => {
     ).rejects.toThrow(InternalServerErrorException);
 
     expect(sendMailMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
   });
 });
