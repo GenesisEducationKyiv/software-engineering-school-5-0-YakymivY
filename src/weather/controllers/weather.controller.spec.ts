@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { WeatherResponse } from '../../weather/interfaces/weather.interface';
-import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
+import { WeatherResponse } from '../interfaces/weather.interface';
+import { WeatherApi } from '../interfaces/weather-api.interface';
 
 import { WeatherController } from './weather.controller';
 

@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Inject } from '@nestjs/common';
 
-import { WeatherResponse } from '../../weather/interfaces/weather.interface';
-import { CityDto } from '../../weather/dtos/city.dto';
-import { WeatherApi } from '../../weather/interfaces/weather-api.interface';
+import { WeatherResponse } from '../interfaces/weather.interface';
+import { CityDto } from '../dtos/city.dto';
+import { WeatherApi } from '../interfaces/weather-api.interface';
 
 @Controller('weather')
 export class WeatherController {

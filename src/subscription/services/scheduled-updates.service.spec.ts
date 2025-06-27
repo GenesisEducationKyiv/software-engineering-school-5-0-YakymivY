@@ -57,6 +57,7 @@ describe('ScheduledUpdatesService', () => {
         } as Subscription,
       ];
       mockGetActiveSubscriptions.mockResolvedValue(subs);
+      mockSendWeatherUpdateEmail.mockResolvedValue(undefined);
       mockGetWeather.mockResolvedValue({
         temperature: 25,
         humidity: 55,
@@ -87,6 +88,7 @@ describe('ScheduledUpdatesService', () => {
         } as Subscription,
       ];
       mockGetActiveSubscriptions.mockResolvedValue(subs);
+      mockSendWeatherUpdateEmail.mockResolvedValue(undefined);
       mockGetWeather.mockResolvedValue({
         temperature: 15,
         humidity: 65,
