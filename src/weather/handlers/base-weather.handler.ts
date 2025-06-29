@@ -4,6 +4,11 @@ import { WeatherProvider } from './weather-provider.interface';
 
 export abstract class BaseWeatherHandler implements WeatherProvider {
   private nextProvider: WeatherProvider | null = null;
+  public name: string;
+
+  public getProviderName(): string {
+    return this.name;
+  }
 
   public setNext(provider: WeatherProvider): this {
     this.nextProvider = provider;

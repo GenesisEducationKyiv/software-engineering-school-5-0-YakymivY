@@ -23,6 +23,7 @@ export class ProviderSecondaryHandler extends BaseWeatherHandler {
     this.openWeatherApiKey = this.configService.getOrThrow<string>(
       'OPENWEATHERMAP_API_KEY',
     );
+    this.name = 'openweathermap.org';
 
     if (!this.openWeatherApiKey) {
       throw new Error('Missing OPENWEATHERMAP_API_KEY environment variable');

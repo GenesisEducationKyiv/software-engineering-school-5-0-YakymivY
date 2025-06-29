@@ -20,6 +20,7 @@ export class ProviderPrimaryHandler extends BaseWeatherHandler {
     private configService: ConfigService,
   ) {
     super();
+    this.name = 'weatherapi.com';
     this.weatherApiKey =
       this.configService.getOrThrow<string>('WEATHER_API_KEY');
 
