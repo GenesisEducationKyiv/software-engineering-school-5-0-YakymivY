@@ -1,6 +1,5 @@
 import { WeatherResponse } from '../interfaces/weather.interface';
-
-import { WeatherProvider } from './weather-provider.interface';
+import { WeatherProvider } from '../interfaces/weather-provider.interface';
 
 export abstract class BaseWeatherHandler implements WeatherProvider {
   private nextProvider: WeatherProvider | null = null;

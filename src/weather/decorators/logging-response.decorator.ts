@@ -1,7 +1,6 @@
 import { WeatherResponse } from '../interfaces/weather.interface';
 import { fileLogger } from '../../../logger.file';
-
-import { WeatherProvider } from './weather-provider.interface';
+import { WeatherProvider } from '../interfaces/weather-provider.interface';
 
 export class LoggingResponseDecorator implements WeatherProvider {
   constructor(private readonly weatherProvider: WeatherProvider) {}

@@ -1,9 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { WeatherProvider } from './handlers/weather-provider.interface';
+import { CachingService } from '../common/services/caching.service';
+
+import { WeatherProvider } from './interfaces/weather-provider.interface';
 import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
 import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
-import { LoggingResponseDecorator } from './handlers/logging-response.decorator';
+import { LoggingResponseDecorator } from './decorators/logging-response.decorator';
+import { CachingResponseDecorator } from './decorators/caching-response.decorator';
 
 @Injectable()
 export class WeatherChain implements OnModuleInit {
@@ -12,10 +15,16 @@ export class WeatherChain implements OnModuleInit {
   constructor(
     private readonly providerPrimaryHandler: ProviderPrimaryHandler,
     private readonly providerSecondaryHandler: ProviderSecondaryHandler,
+    private readonly cachingService: CachingService,
   ) {}
 
   onModuleInit(): void {
+    this.handler = this.buildWeatherChain();
+  }
+
+  private buildWeatherChain(): WeatherProvider {
     this.providerPrimaryHandler.setNext(this.providerSecondaryHandler);
-    this.handler = new LoggingResponseDecorator(this.providerPrimaryHandler);
+    const logger = new LoggingResponseDecorator(this.providerPrimaryHandler);
+    return new CachingResponseDecorator(logger, this.cachingService);
   }
 }

@@ -2,6 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 
 import { SubscriptionModule } from '../subscription/subscription.module';
+import { CachingService } from '../common/services/caching.service';
 
 import { WeatherService } from './services/weather.service';
 import { WeatherController } from './controllers/weather.controller';
@@ -20,6 +21,7 @@ import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler'
     WeatherChain,
     ProviderPrimaryHandler,
     ProviderSecondaryHandler,
+    CachingService,
   ],
   controllers: [WeatherController],
   exports: [
@@ -27,6 +29,7 @@ import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler'
     WeatherChain,
     ProviderPrimaryHandler,
     ProviderSecondaryHandler,
+    CachingService,
   ],
 })
 export class WeatherModule {}

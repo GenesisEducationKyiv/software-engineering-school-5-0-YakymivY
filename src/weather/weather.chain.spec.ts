@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
+import { CachingService } from '../common/services/caching.service';
+
 import { WeatherChain } from './weather.chain';
 import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
 import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
@@ -31,6 +33,13 @@ describe('WeatherChain', () => {
           provide: ConfigService,
           useValue: {
             getOrThrow: jest.fn().mockReturnValue('dummy_key'),
+          },
+        },
+        {
+          provide: CachingService,
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
           },
         },
       ],
