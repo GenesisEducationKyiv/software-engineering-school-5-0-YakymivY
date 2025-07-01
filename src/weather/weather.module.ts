@@ -1,8 +1,8 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 
+import { CommonModule } from '../common/common.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
-import { CachingService } from '../common/services/caching.service';
 
 import { WeatherService } from './services/weather.service';
 import { WeatherController } from './controllers/weather.controller';
@@ -11,7 +11,7 @@ import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
 import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
 
 @Module({
-  imports: [HttpModule, forwardRef(() => SubscriptionModule)],
+  imports: [HttpModule, forwardRef(() => SubscriptionModule), CommonModule],
   providers: [
     WeatherService,
     {
@@ -21,7 +21,6 @@ import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler'
     WeatherChain,
     ProviderPrimaryHandler,
     ProviderSecondaryHandler,
-    CachingService,
   ],
   controllers: [WeatherController],
   exports: [
@@ -29,7 +28,6 @@ import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler'
     WeatherChain,
     ProviderPrimaryHandler,
     ProviderSecondaryHandler,
-    CachingService,
   ],
 })
 export class WeatherModule {}

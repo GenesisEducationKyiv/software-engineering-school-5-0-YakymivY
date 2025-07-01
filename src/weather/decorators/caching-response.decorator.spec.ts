@@ -1,6 +1,7 @@
 import { WeatherResponse } from '../interfaces/weather.interface';
 import { CachingService } from '../../common/services/caching.service';
 import { WeatherProvider } from '../interfaces/weather-provider.interface';
+import { MetricsService } from '../../common/services/metrics.service';
 
 import { CachingResponseDecorator } from './caching-response.decorator';
 
@@ -8,6 +9,7 @@ describe('CachingResponseDecorator', () => {
   let decorator: CachingResponseDecorator;
   let weatherProviderMock: jest.Mocked<WeatherProvider>;
   let cachingServiceMock: jest.Mocked<CachingService>;
+  let metricsServiceMock: jest.Mocked<MetricsService>;
 
   const city = 'Kyiv';
   const cacheKey = `weather:${city.toLowerCase()}`;
@@ -29,9 +31,14 @@ describe('CachingResponseDecorator', () => {
       set: jest.fn(),
     } as any;
 
+    metricsServiceMock = {
+      record: jest.fn(),
+    } as any;
+
     decorator = new CachingResponseDecorator(
       weatherProviderMock,
       cachingServiceMock,
+      metricsServiceMock,
     );
   });
 
@@ -44,6 +51,7 @@ describe('CachingResponseDecorator', () => {
 
     expect(cachingServiceMock.get).toHaveBeenCalledWith(cacheKey);
     expect(weatherProviderMock.getCurrentWeather).not.toHaveBeenCalled();
+    expect(metricsServiceMock.record).toHaveBeenCalledWith('hit');
     expect(result).toEqual(weatherData);
   });
 
@@ -60,6 +68,7 @@ describe('CachingResponseDecorator', () => {
       weatherData,
       180,
     );
+    expect(metricsServiceMock.record).toHaveBeenCalledWith('miss');
     expect(result).toEqual(weatherData);
   });
 
