@@ -1,16 +1,19 @@
 import { join } from 'path';
 
 import { Module } from '@nestjs/common';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WeatherModule } from './weather/weather.module';
 import { DatabaseModule } from './database/database.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -32,6 +35,18 @@ import { SubscriptionModule } from './subscription/subscription.module';
       }),
       inject: [ConfigService],
     }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'single',
+        url: `redis://${configService.get<string>('REDIS_HOST')}:${configService.get<number>('REDIS_PORT')}/${configService.get<number>('REDIS_DB')}`,
+        options: {
+          password: configService.get<string>('REDIS_PASS'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    PrometheusModule.register(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       exclude: ['/api*'],
@@ -39,6 +54,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     WeatherModule,
     DatabaseModule,
     SubscriptionModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
