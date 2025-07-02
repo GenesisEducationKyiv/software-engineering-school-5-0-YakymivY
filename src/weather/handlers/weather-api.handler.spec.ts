@@ -8,10 +8,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
-import { ProviderPrimaryHandler } from './provider-primary.handler';
+import { WeatherApiHandler } from './weather-api.handler';
 
-describe('ProviderPrimaryHandler', () => {
-  let service: ProviderPrimaryHandler;
+describe('WeatherApiHandler', () => {
+  let service: WeatherApiHandler;
 
   const mockHttpService = {
     get: jest.fn(),
@@ -24,13 +24,13 @@ describe('ProviderPrimaryHandler', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ProviderPrimaryHandler,
+        WeatherApiHandler,
         { provide: HttpService, useValue: mockHttpService },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
-    service = module.get(ProviderPrimaryHandler);
+    service = module.get(WeatherApiHandler);
   });
 
   afterEach(() => jest.clearAllMocks());
@@ -102,16 +102,5 @@ describe('ProviderPrimaryHandler', () => {
     await expect((service as any).fetch('ServerCrashedCity')).rejects.toThrow(
       InternalServerErrorException,
     );
-  });
-
-  it('should throw an error if WEATHER_API_KEY is missing', () => {
-    mockConfigService.getOrThrow = jest.fn().mockReturnValue(undefined);
-
-    expect(() => {
-      new ProviderPrimaryHandler(
-        mockHttpService as any,
-        mockConfigService as any,
-      );
-    }).toThrow('Missing WEATHER_API_KEY environment variable');
   });
 });

@@ -3,12 +3,12 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
 import { WeatherChain } from './weather.chain';
-import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
-import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
+import { WeatherApiHandler } from './handlers/weather-api.handler';
+import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
 
 describe('WeatherChain', () => {
-  let primaryHandler: ProviderPrimaryHandler;
-  let secondaryHandler: ProviderSecondaryHandler;
+  let primaryHandler: WeatherApiHandler;
+  let secondaryHandler: OpenWeatherMapHandler;
   let weatherChain: WeatherChain;
 
   const mockWeather = {
@@ -21,8 +21,8 @@ describe('WeatherChain', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WeatherChain,
-        ProviderPrimaryHandler,
-        ProviderSecondaryHandler,
+        WeatherApiHandler,
+        OpenWeatherMapHandler,
         {
           provide: HttpService,
           useValue: { get: jest.fn() },
@@ -36,8 +36,8 @@ describe('WeatherChain', () => {
       ],
     }).compile();
 
-    primaryHandler = module.get(ProviderPrimaryHandler);
-    secondaryHandler = module.get(ProviderSecondaryHandler);
+    primaryHandler = module.get(WeatherApiHandler);
+    secondaryHandler = module.get(OpenWeatherMapHandler);
     weatherChain = module.get(WeatherChain);
 
     weatherChain.onModuleInit(); // sets the chain

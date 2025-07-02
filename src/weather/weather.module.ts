@@ -6,8 +6,8 @@ import { SubscriptionModule } from '../subscription/subscription.module';
 import { WeatherService } from './services/weather.service';
 import { WeatherController } from './controllers/weather.controller';
 import { WeatherChain } from './weather.chain';
-import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
-import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
+import { WeatherApiHandler } from './handlers/weather-api.handler';
+import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
 
 @Module({
   imports: [HttpModule, forwardRef(() => SubscriptionModule)],
@@ -18,15 +18,15 @@ import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler'
       useClass: WeatherService,
     },
     WeatherChain,
-    ProviderPrimaryHandler,
-    ProviderSecondaryHandler,
+    WeatherApiHandler,
+    OpenWeatherMapHandler,
   ],
   controllers: [WeatherController],
   exports: [
     'WeatherApi',
     WeatherChain,
-    ProviderPrimaryHandler,
-    ProviderSecondaryHandler,
+    WeatherApiHandler,
+    OpenWeatherMapHandler,
   ],
 })
 export class WeatherModule {}

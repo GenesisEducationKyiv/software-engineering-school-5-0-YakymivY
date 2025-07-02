@@ -1,8 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
 import { WeatherProvider } from './handlers/weather-provider.interface';
-import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
-import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
+import { WeatherApiHandler } from './handlers/weather-api.handler';
+import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
 import { LoggingResponseDecorator } from './handlers/logging-response.decorator';
 
 @Injectable()
@@ -10,12 +10,12 @@ export class WeatherChain implements OnModuleInit {
   public handler: WeatherProvider;
 
   constructor(
-    private readonly providerPrimaryHandler: ProviderPrimaryHandler,
-    private readonly providerSecondaryHandler: ProviderSecondaryHandler,
+    private readonly WeatherApiHandler: WeatherApiHandler,
+    private readonly OpenWeatherMapHandler: OpenWeatherMapHandler,
   ) {}
 
   onModuleInit(): void {
-    this.providerPrimaryHandler.setNext(this.providerSecondaryHandler);
-    this.handler = new LoggingResponseDecorator(this.providerPrimaryHandler);
+    this.WeatherApiHandler.setNext(this.OpenWeatherMapHandler);
+    this.handler = new LoggingResponseDecorator(this.WeatherApiHandler);
   }
 }

@@ -12,7 +12,7 @@ import { WeatherResponse } from '../interfaces/weather.interface';
 import { BaseWeatherHandler } from './base-weather.handler';
 
 @Injectable()
-export class ProviderSecondaryHandler extends BaseWeatherHandler {
+export class OpenWeatherMapHandler extends BaseWeatherHandler {
   private readonly openWeatherApiKey: string;
 
   constructor(
@@ -24,10 +24,6 @@ export class ProviderSecondaryHandler extends BaseWeatherHandler {
       'OPENWEATHERMAP_API_KEY',
     );
     this.name = 'openweathermap.org';
-
-    if (!this.openWeatherApiKey) {
-      throw new Error('Missing OPENWEATHERMAP_API_KEY environment variable');
-    }
   }
 
   protected async fetch(city: string): Promise<WeatherResponse> {
