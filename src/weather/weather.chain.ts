@@ -10,12 +10,12 @@ export class WeatherChain implements OnModuleInit {
   public handler: WeatherProvider;
 
   constructor(
-    private readonly WeatherApiHandler: WeatherApiHandler,
-    private readonly OpenWeatherMapHandler: OpenWeatherMapHandler,
+    private readonly weatherApiHandler: WeatherApiHandler,
+    private readonly openWeatherMapHandler: OpenWeatherMapHandler,
   ) {}
 
   onModuleInit(): void {
-    this.WeatherApiHandler.setNext(this.OpenWeatherMapHandler);
-    this.handler = new LoggingResponseDecorator(this.WeatherApiHandler);
+    this.weatherApiHandler.setNext(this.openWeatherMapHandler);
+    this.handler = new LoggingResponseDecorator(this.weatherApiHandler);
   }
 }

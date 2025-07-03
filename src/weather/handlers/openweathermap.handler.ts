@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 
-import { WeatherResponse } from '../interfaces/weather.interface';
+import { HandlerResponse } from '../interfaces/weather.interface';
 
 import { BaseWeatherHandler } from './base-weather.handler';
 
@@ -26,7 +26,7 @@ export class OpenWeatherMapHandler extends BaseWeatherHandler {
     this.name = 'openweathermap.org';
   }
 
-  protected async fetch(city: string): Promise<WeatherResponse> {
+  protected async fetch(city: string): Promise<HandlerResponse> {
     try {
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.openWeatherApiKey}`;
       const response = await lastValueFrom(this.http.get(url));
@@ -37,10 +37,13 @@ export class OpenWeatherMapHandler extends BaseWeatherHandler {
         };
         weather: { description: string }[];
       };
-      const weather: WeatherResponse = {
-        temperature: data.main.temp,
-        humidity: data.main.humidity,
-        description: data.weather[0].description,
+      const weather: HandlerResponse = {
+        provider: this.name,
+        weather: {
+          temperature: data.main.temp,
+          humidity: data.main.humidity,
+          description: data.weather[0].description,
+        },
       };
       return weather;
     } catch (error) {

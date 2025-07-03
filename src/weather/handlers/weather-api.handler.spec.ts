@@ -62,9 +62,12 @@ describe('WeatherApiHandler', () => {
     const result = await (service as any).fetch('Kyiv');
 
     expect(result).toEqual({
-      temperature: 23,
-      humidity: 55,
-      description: 'Sunny',
+      provider: 'weatherapi.com',
+      weather: {
+        temperature: 23,
+        humidity: 55,
+        description: 'Sunny',
+      },
     });
 
     expect(mockHttpService.get).toHaveBeenCalledWith(
