@@ -19,7 +19,7 @@
     "test:integration:start": "docker compose -f docker-compose.test.yml --env-file .env.test up test_db test_redis -d --wait",
     "test:integration": "NODE_ENV=test DB_HOST=localhost REDIS_HOST=localhost jest --config jest.integration.json",
     "test:integration:stop": "docker compose -f docker-compose.test.yml down -v",
-    "test:e2e:start": "DB_HOST=test_db DB_PORT=5433 REDIS_HOST=test_redis docker compose -f docker-compose.test.yml --env-file .env.test up -d --build",
+    "test:e2e:start": "DB_HOST=test_db DB_PORT=5433 REDIS_HOST=test_redis docker compose -f docker-compose.test.yml --env-file .env.test up -d --wait",
     "test:e2e": "NODE_ENV=test DB_HOST=test_db DB_PORT=5433 REDIS_HOST=test_redis npx playwright test --config playwright.config.ts",
     "test:e2e:stop": "docker compose -f docker-compose.test.yml down -v",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
