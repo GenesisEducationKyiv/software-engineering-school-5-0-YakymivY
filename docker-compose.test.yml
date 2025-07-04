@@ -7,10 +7,15 @@ services:
     env_file:
       - .env.test
     depends_on:
-      - test_db
-      - test_redis
+      test_db:
+        condition: service_healthy
+      test_redis:
+        condition: service_healthy
     environment:
       NODE_ENV: test
+    networks:
+      - test_network
+
   test_db:
     image: postgres:15
     restart: always
@@ -25,6 +30,10 @@ services:
       interval: 5s
       retries: 5
       timeout: 5s
+    networks:
+      test_network:
+        aliases:
+          - test_db
 
   test_redis:
     image: redis:alpine
@@ -35,13 +44,23 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASS}
     volumes:
-      - redis_data:/data
+      - redis_test_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 1s
       timeout: 3s
       retries: 5
+    networks:
+      test_network:
+        aliases:
+          - test_redis
 
 volumes:
   pg_test_data:
-  redis_data:
+  redis_test_data:
+
+networks:
+  test_network:
+    aliases:
+      - test_db
+      - test_redis
