@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    command: sh -c "npm run migration:run && npm run start:prod"
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.test
+    depends_on:
+      - test_db
+    environment:
+      NODE_ENV: test
+  test_db:
+    image: postgres:15
+    restart: always
+    env_file:
+      - .env.test
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - pg_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d weather_app_test"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+
+volumes:
+  pg_test_data:
