@@ -9,6 +9,7 @@ export class WeatherService implements WeatherApi {
   constructor(private readonly weatherChain: WeatherChain) {}
 
   async getCurrentWeather(city: string): Promise<WeatherResponse> {
-    return this.weatherChain.handler.getCurrentWeather(city);
+    const response = await this.weatherChain.handler.getCurrentWeather(city);
+    return response.weather;
   }
 }

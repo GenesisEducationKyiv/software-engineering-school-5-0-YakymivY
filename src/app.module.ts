@@ -1,7 +1,6 @@
 import { join } from 'path';
 
 import { Module } from '@nestjs/common';
-import { RedisModule } from '@nestjs-modules/ioredis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -32,17 +31,6 @@ import { CommonModule } from './common/common.module';
         database: configService.get('DB_NAME'),
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV === 'test',
-      }),
-      inject: [ConfigService],
-    }),
-    RedisModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'single',
-        url: `redis://${configService.get<string>('REDIS_HOST')}:${configService.get<number>('REDIS_PORT')}/${configService.get<number>('REDIS_DB')}`,
-        options: {
-          password: configService.get<string>('REDIS_PASS'),
-        },
       }),
       inject: [ConfigService],
     }),

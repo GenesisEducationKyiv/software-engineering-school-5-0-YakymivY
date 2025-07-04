@@ -2,17 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
-import { CachingService } from '../common/services/caching.service';
 import { MetricsService } from '../common/services/metrics.service';
+import { CachingService } from '../common/services/caching.service';
 
 import { WeatherChain } from './weather.chain';
-import { ProviderPrimaryHandler } from './handlers/provider-primary.handler';
-import { ProviderSecondaryHandler } from './handlers/provider-secondary.handler';
+import { WeatherApiHandler } from './handlers/weather-api.handler';
+import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
 
 describe('WeatherChain', () => {
-  let primaryHandler: ProviderPrimaryHandler;
-  let secondaryHandler: ProviderSecondaryHandler;
+  let primaryHandler: WeatherApiHandler;
+  let secondaryHandler: OpenWeatherMapHandler;
   let weatherChain: WeatherChain;
+  let cachingService: CachingService;
+  let metricsService: MetricsService;
 
   const mockWeather = {
     temperature: 25,
@@ -24,8 +26,8 @@ describe('WeatherChain', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WeatherChain,
-        ProviderPrimaryHandler,
-        ProviderSecondaryHandler,
+        WeatherApiHandler,
+        OpenWeatherMapHandler,
         {
           provide: HttpService,
           useValue: { get: jest.fn() },
@@ -33,29 +35,25 @@ describe('WeatherChain', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn(),
             getOrThrow: jest.fn().mockReturnValue('dummy_key'),
           },
         },
         {
-          provide: MetricsService,
-          useValue: {
-            record: jest.fn(),
-          },
+          provide: CachingService,
+          useValue: { get: jest.fn(), set: jest.fn() },
         },
         {
-          provide: CachingService,
-          useValue: {
-            get: jest.fn(),
-            set: jest.fn(),
-          },
+          provide: MetricsService,
+          useValue: { record: jest.fn() },
         },
       ],
     }).compile();
 
-    primaryHandler = module.get(ProviderPrimaryHandler);
-    secondaryHandler = module.get(ProviderSecondaryHandler);
+    primaryHandler = module.get(WeatherApiHandler);
+    secondaryHandler = module.get(OpenWeatherMapHandler);
     weatherChain = module.get(WeatherChain);
+    cachingService = module.get(CachingService);
+    metricsService = module.get(MetricsService);
 
     weatherChain.onModuleInit(); // sets the chain
   });
@@ -66,6 +64,8 @@ describe('WeatherChain', () => {
     const result = await weatherChain.handler.getCurrentWeather('Kyiv');
 
     expect(result).toEqual(mockWeather);
+    expect(cachingService.get).toHaveBeenCalledWith('weather:kyiv');
+    expect(metricsService.record).toHaveBeenCalledWith('miss');
   });
 
   it('should fall back to secondary if primary fails', async () => {
@@ -79,6 +79,8 @@ describe('WeatherChain', () => {
     const result = await weatherChain.handler.getCurrentWeather('Lviv');
 
     expect(result).toEqual(mockWeather);
+    expect(cachingService.get).toHaveBeenCalledWith('weather:lviv');
+    expect(metricsService.record).toHaveBeenCalledWith('miss');
   });
 
   it('should throw if both fail', async () => {

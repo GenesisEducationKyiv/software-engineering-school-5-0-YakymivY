@@ -16,10 +16,6 @@ export class MailBuilderService {
     private configService: ConfigService,
   ) {
     this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
-
-    if (!this.baseUrl) {
-      throw new Error('Missing BASE_URL environment variable');
-    }
   }
 
   async sendConfirmationEmail(email: string, token: string): Promise<void> {

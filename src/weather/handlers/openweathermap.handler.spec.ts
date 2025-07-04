@@ -8,12 +8,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
-import { WeatherResponse } from '../interfaces/weather.interface';
+import { HandlerResponse } from '../interfaces/weather.interface';
 
-import { ProviderSecondaryHandler } from './provider-secondary.handler';
+import { OpenWeatherMapHandler } from './openweathermap.handler';
 
-describe('ProviderSecondaryHandler', () => {
-  let service: ProviderSecondaryHandler;
+describe('OpenWeatherMapHandler', () => {
+  let service: OpenWeatherMapHandler;
   let httpService: { get: jest.Mock };
   let configService: { getOrThrow: jest.Mock };
 
@@ -25,13 +25,13 @@ describe('ProviderSecondaryHandler', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        ProviderSecondaryHandler,
+        OpenWeatherMapHandler,
         { provide: HttpService, useValue: httpService },
         { provide: ConfigService, useValue: configService },
       ],
     }).compile();
 
-    service = module.get<ProviderSecondaryHandler>(ProviderSecondaryHandler);
+    service = module.get<OpenWeatherMapHandler>(OpenWeatherMapHandler);
   });
 
   it('should be defined', () => {
@@ -62,10 +62,13 @@ describe('ProviderSecondaryHandler', () => {
 
     const result = await service['fetch'](city);
 
-    const expected: WeatherResponse = {
-      temperature: 20,
-      humidity: 60,
-      description: 'clear sky',
+    const expected: HandlerResponse = {
+      provider: 'openweathermap.org',
+      weather: {
+        temperature: 20,
+        humidity: 60,
+        description: 'clear sky',
+      },
     };
 
     expect(result).toEqual(expected);

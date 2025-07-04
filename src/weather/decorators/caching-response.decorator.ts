@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CachingService } from '../../common/services/caching.service';
 import { WeatherProvider } from '../interfaces/weather-provider.interface';
-import { WeatherResponse } from '../interfaces/weather.interface';
+import { HandlerResponse } from '../interfaces/weather.interface';
 import { MetricsService } from '../../common/services/metrics.service';
 
 @Injectable()
@@ -22,11 +22,11 @@ export class CachingResponseDecorator implements WeatherProvider {
     return this;
   }
 
-  public async getCurrentWeather(city: string): Promise<WeatherResponse> {
+  public async getCurrentWeather(city: string): Promise<HandlerResponse> {
     const cacheKey = `weather:${city.toLowerCase()}`;
 
-    const cachedResponse: WeatherResponse | null =
-      await this.cachingService.get<WeatherResponse>(cacheKey);
+    const cachedResponse: HandlerResponse | null =
+      await this.cachingService.get<HandlerResponse>(cacheKey);
     if (cachedResponse) {
       this.metrics.record('hit');
       return cachedResponse;

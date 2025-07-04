@@ -1,5 +1,5 @@
 import { fileLogger } from '../../../logger.file';
-import { WeatherResponse } from '../interfaces/weather.interface';
+import { HandlerResponse } from '../interfaces/weather.interface';
 import { WeatherProvider } from '../interfaces/weather-provider.interface';
 
 import { LoggingResponseDecorator } from './logging-response.decorator';
@@ -25,10 +25,13 @@ describe('LoggingResponseDecorator', () => {
   });
 
   it('should delegate getCurrentWeather and log the response', async () => {
-    const mockResponse: WeatherResponse = {
-      temperature: 22,
-      humidity: 60,
-      description: 'Clear sky',
+    const mockResponse: HandlerResponse = {
+      provider: 'MockProvider',
+      weather: {
+        temperature: 22,
+        humidity: 60,
+        description: 'Clear sky',
+      },
     };
 
     mockProvider.getCurrentWeather.mockResolvedValueOnce(mockResponse);

@@ -3,3 +3,8 @@ export interface WeatherResponse {
   humidity: number;
   description: string;
 }
+
+export interface HandlerResponse {
+  provider: string;
+  weather: WeatherResponse;
+}
