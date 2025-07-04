@@ -31,7 +31,7 @@ describe('MetricsService', () => {
   });
 
   it('should increment the hit label', () => {
-    service.record('hit');
+    service.trackCacheRequest('hit');
 
     expect(Counter).toHaveBeenCalledWith({
       name: 'cache_requests',
@@ -46,7 +46,7 @@ describe('MetricsService', () => {
   });
 
   it('should increment the miss label', () => {
-    service.record('miss');
+    service.trackCacheRequest('miss');
 
     expect(labelsMock.inc).toHaveBeenCalled();
     expect(
@@ -63,7 +63,7 @@ describe('MetricsService', () => {
     });
 
     const failingService = new MetricsService();
-    failingService.record('hit');
+    failingService.trackCacheRequest('hit');
 
     expect(consoleLogger.error).toHaveBeenCalledWith(
       'Error recording metric:',

@@ -44,7 +44,7 @@ describe('WeatherChain', () => {
         },
         {
           provide: MetricsService,
-          useValue: { record: jest.fn() },
+          useValue: { trackCacheRequest: jest.fn() },
         },
       ],
     }).compile();
@@ -65,7 +65,7 @@ describe('WeatherChain', () => {
 
     expect(result).toEqual(mockWeather);
     expect(cachingService.get).toHaveBeenCalledWith('weather:kyiv');
-    expect(metricsService.record).toHaveBeenCalledWith('miss');
+    expect(metricsService.trackCacheRequest).toHaveBeenCalledWith('miss');
   });
 
   it('should fall back to secondary if primary fails', async () => {
@@ -80,7 +80,7 @@ describe('WeatherChain', () => {
 
     expect(result).toEqual(mockWeather);
     expect(cachingService.get).toHaveBeenCalledWith('weather:lviv');
-    expect(metricsService.record).toHaveBeenCalledWith('miss');
+    expect(metricsService.trackCacheRequest).toHaveBeenCalledWith('miss');
   });
 
   it('should throw if both fail', async () => {

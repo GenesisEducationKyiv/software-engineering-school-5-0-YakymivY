@@ -15,7 +15,7 @@ export class MetricsService {
     });
   }
 
-  public record(result: 'hit' | 'miss'): void {
+  public trackCacheRequest(result: 'hit' | 'miss'): void {
     try {
       this.counter.labels(result).inc();
     } catch (error) {

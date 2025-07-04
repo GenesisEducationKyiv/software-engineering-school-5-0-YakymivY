@@ -35,7 +35,7 @@ describe('CachingResponseDecorator', () => {
     } as any;
 
     metricsServiceMock = {
-      record: jest.fn(),
+      trackCacheRequest: jest.fn(),
     } as any;
 
     decorator = new CachingResponseDecorator(
@@ -54,7 +54,7 @@ describe('CachingResponseDecorator', () => {
 
     expect(cachingServiceMock.get).toHaveBeenCalledWith(cacheKey);
     expect(weatherProviderMock.getCurrentWeather).not.toHaveBeenCalled();
-    expect(metricsServiceMock.record).toHaveBeenCalledWith('hit');
+    expect(metricsServiceMock.trackCacheRequest).toHaveBeenCalledWith('hit');
     expect(result).toEqual(weatherData);
   });
 
@@ -71,7 +71,7 @@ describe('CachingResponseDecorator', () => {
       weatherData,
       180,
     );
-    expect(metricsServiceMock.record).toHaveBeenCalledWith('miss');
+    expect(metricsServiceMock.trackCacheRequest).toHaveBeenCalledWith('miss');
     expect(result).toEqual(weatherData);
   });
 

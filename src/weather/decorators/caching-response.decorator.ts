@@ -28,13 +28,13 @@ export class CachingResponseDecorator implements WeatherProvider {
     const cachedResponse: HandlerResponse | null =
       await this.cachingService.get<HandlerResponse>(cacheKey);
     if (cachedResponse) {
-      this.metrics.record('hit');
+      this.metrics.trackCacheRequest('hit');
       return cachedResponse;
     }
 
+    this.metrics.trackCacheRequest('miss');
     const response = await this.weatherProvider.getCurrentWeather(city);
     await this.cachingService.set(cacheKey, response, 180);
-    this.metrics.record('miss');
     return response;
   }
 }
