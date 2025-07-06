@@ -1,6 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 
+import { CommonModule } from '../common/common.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
 
 import { WeatherService } from './services/weather.service';
@@ -10,7 +11,7 @@ import { WeatherApiHandler } from './handlers/weather-api.handler';
 import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
 
 @Module({
-  imports: [HttpModule, forwardRef(() => SubscriptionModule)],
+  imports: [HttpModule, forwardRef(() => SubscriptionModule), CommonModule],
   providers: [
     WeatherService,
     {

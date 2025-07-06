@@ -5,12 +5,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WeatherModule } from './weather/weather.module';
 import { DatabaseModule } from './database/database.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
       }),
       inject: [ConfigService],
     }),
+    PrometheusModule.register(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       exclude: ['/api*'],
@@ -39,6 +42,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     WeatherModule,
     DatabaseModule,
     SubscriptionModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

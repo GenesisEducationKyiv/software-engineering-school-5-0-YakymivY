@@ -1,8 +1,8 @@
 import { fileLogger } from '../../../logger.file';
 import { HandlerResponse } from '../interfaces/weather.interface';
+import { WeatherProvider } from '../interfaces/weather-provider.interface';
 
 import { LoggingResponseDecorator } from './logging-response.decorator';
-import { WeatherProvider } from './weather-provider.interface';
 
 jest.mock('../../../logger.file', () => ({
   fileLogger: {

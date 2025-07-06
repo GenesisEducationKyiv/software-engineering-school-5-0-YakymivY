@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
+import { MetricsService } from '../common/services/metrics.service';
+import { CachingService } from '../common/services/caching.service';
+
 import { WeatherChain } from './weather.chain';
 import { WeatherApiHandler } from './handlers/weather-api.handler';
 import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
@@ -10,6 +13,8 @@ describe('WeatherChain', () => {
   let primaryHandler: WeatherApiHandler;
   let secondaryHandler: OpenWeatherMapHandler;
   let weatherChain: WeatherChain;
+  let cachingService: CachingService;
+  let metricsService: MetricsService;
 
   const mockWeather = {
     temperature: 25,
@@ -33,12 +38,22 @@ describe('WeatherChain', () => {
             getOrThrow: jest.fn().mockReturnValue('dummy_key'),
           },
         },
+        {
+          provide: CachingService,
+          useValue: { get: jest.fn(), set: jest.fn() },
+        },
+        {
+          provide: MetricsService,
+          useValue: { trackCacheRequest: jest.fn() },
+        },
       ],
     }).compile();
 
     primaryHandler = module.get(WeatherApiHandler);
     secondaryHandler = module.get(OpenWeatherMapHandler);
     weatherChain = module.get(WeatherChain);
+    cachingService = module.get(CachingService);
+    metricsService = module.get(MetricsService);
 
     weatherChain.onModuleInit(); // sets the chain
   });
@@ -49,6 +64,8 @@ describe('WeatherChain', () => {
     const result = await weatherChain.handler.getCurrentWeather('Kyiv');
 
     expect(result).toEqual(mockWeather);
+    expect(cachingService.get).toHaveBeenCalledWith('weather:kyiv');
+    expect(metricsService.trackCacheRequest).toHaveBeenCalledWith('miss');
   });
 
   it('should fall back to secondary if primary fails', async () => {
@@ -62,6 +79,8 @@ describe('WeatherChain', () => {
     const result = await weatherChain.handler.getCurrentWeather('Lviv');
 
     expect(result).toEqual(mockWeather);
+    expect(cachingService.get).toHaveBeenCalledWith('weather:lviv');
+    expect(metricsService.trackCacheRequest).toHaveBeenCalledWith('miss');
   });
 
   it('should throw if both fail', async () => {
