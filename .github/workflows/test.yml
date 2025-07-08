@@ -65,4 +65,8 @@ jobs:
 
       - name: Stop test database
         run: npm run test:e2e:stop
+
+      # --- Architecture Tests ---
+      - name: Run architecture tests
+        run: npm run test:arch
         
