@@ -10,7 +10,6 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { WeatherModule } from './weather/weather.module';
-import { DatabaseModule } from './database/database.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { CommonModule } from './common/common.module';
 
@@ -40,7 +39,6 @@ import { CommonModule } from './common/common.module';
       exclude: ['/api*'],
     }),
     WeatherModule,
-    DatabaseModule,
     SubscriptionModule,
     CommonModule,
   ],

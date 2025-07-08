@@ -3,14 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HttpModule } from '@nestjs/axios';
 
 import { WeatherModule } from '../weather/weather.module';
-import { WeatherService } from '../weather/services/weather.service';
+import { WeatherService } from '../weather/application/services/weather.service';
 
-import { SubscriptionService } from './services/subscription.service';
-import { SubscriptionController } from './controllers/subscription.controller';
-import { Subscription } from './entities/subscription.entity';
-import { MailService } from './services/mail.service';
-import { ScheduledUpdatesService } from './services/scheduled-updates.service';
-import { MailBuilderService } from './services/mail-builder.service';
+import { SubscriptionService } from './application/services/subscription.service';
+import { SubscriptionController } from './presentation/controllers/subscription.controller';
+import { Subscription } from './domain/entities/subscription.entity';
+import { MailService } from './infrastructure/services/mail.service';
+import { ScheduledUpdatesService } from './application/services/scheduled-updates.service';
+import { MailBuilderService } from './infrastructure/services/mail-builder.service';
 
 @Module({
   imports: [
