@@ -1,4 +1,5 @@
-import { HandlerResponse } from '../interfaces/weather.interface';
+import { WeatherResponse } from '../interfaces/weather.interface';
+import { logResponse } from '../utils/weather.utils';
 
 import { WeatherProvider } from './weather-provider.interface';
 
@@ -15,10 +16,10 @@ export abstract class BaseWeatherHandler implements WeatherProvider {
     return this;
   }
 
-  public async getCurrentWeather(city: string): Promise<HandlerResponse> {
+  public async getCurrentWeather(city: string): Promise<WeatherResponse> {
     try {
       const response = await this.fetch(city);
-      response.provider = this.getProviderName();
+      logResponse(this.getProviderName(), response);
       return response;
     } catch (err) {
       if (this.nextProvider) {
@@ -28,5 +29,5 @@ export abstract class BaseWeatherHandler implements WeatherProvider {
     }
   }
 
-  protected abstract fetch(city: string): Promise<HandlerResponse>;
+  protected abstract fetch(city: string): Promise<WeatherResponse>;
 }

@@ -1,4 +1,4 @@
-import { HandlerResponse } from '../interfaces/weather.interface';
+import { WeatherResponse } from '../interfaces/weather.interface';
 import { CachingService } from '../../common/services/caching.service';
 import { WeatherProvider } from '../interfaces/weather-provider.interface';
 import { MetricsService } from '../../common/services/metrics.service';
@@ -13,13 +13,10 @@ describe('CachingResponseDecorator', () => {
 
   const city = 'Kyiv';
   const cacheKey = `weather:${city.toLowerCase()}`;
-  const weatherData: HandlerResponse = {
-    provider: 'MockProvider',
-    weather: {
-      temperature: 20,
-      humidity: 60,
-      description: 'clear',
-    },
+  const weatherData: WeatherResponse = {
+    temperature: 20,
+    humidity: 60,
+    description: 'clear',
   };
 
   beforeEach(() => {
