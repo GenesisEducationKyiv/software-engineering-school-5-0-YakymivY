@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { WeatherChain } from '../weather.chain';
-import { HandlerResponse } from '../interfaces/weather.interface';
+import { WeatherResponse } from '../interfaces/weather.interface';
 
 import { WeatherService } from './weather.service';
 
@@ -35,13 +35,10 @@ describe('WeatherService', () => {
 
   it('should return current weather from chain handler', async () => {
     const city = 'Kyiv';
-    const mockWeather: HandlerResponse = {
-      provider: 'weatherapi.com',
-      weather: {
-        temperature: 22,
-        humidity: 55,
-        description: 'Sunny',
-      },
+    const mockWeather: WeatherResponse = {
+      temperature: 22,
+      humidity: 55,
+      description: 'Sunny',
     };
 
     weatherChain.handler.getCurrentWeather.mockResolvedValueOnce(mockWeather);
@@ -49,7 +46,7 @@ describe('WeatherService', () => {
     const result = await service.getCurrentWeather(city);
 
     expect(weatherChain.handler.getCurrentWeather).toHaveBeenCalledWith(city);
-    expect(result).toEqual(mockWeather.weather);
+    expect(result).toEqual(mockWeather);
   });
 
   it('should propagate error if handler throws', async () => {

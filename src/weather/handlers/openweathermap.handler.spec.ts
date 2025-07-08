@@ -8,7 +8,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
-import { HandlerResponse } from '../interfaces/weather.interface';
+import { WeatherResponse } from '../interfaces/weather.interface';
 
 import { OpenWeatherMapHandler } from './openweathermap.handler';
 
@@ -62,13 +62,10 @@ describe('OpenWeatherMapHandler', () => {
 
     const result = await service['fetch'](city);
 
-    const expected: HandlerResponse = {
-      provider: 'openweathermap.org',
-      weather: {
-        temperature: 20,
-        humidity: 60,
-        description: 'clear sky',
-      },
+    const expected: WeatherResponse = {
+      temperature: 20,
+      humidity: 60,
+      description: 'clear sky',
     };
 
     expect(result).toEqual(expected);
