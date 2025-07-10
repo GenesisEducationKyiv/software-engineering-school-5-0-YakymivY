@@ -3,7 +3,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 // Services
 import { MetricsService } from '../../../common/services/metrics.service';
 import { CachingService } from '../../../common/services/caching.service';
-import { WeatherProvider } from '../interfaces/weather-provider.interface';
+import { WeatherProvider } from '../../domain/interfaces/weather-provider.interface';
 import { WeatherApiHandler } from '../../infrastructure/external-services/weatherapi/weather-api.handler';
 import { OpenWeatherMapHandler } from '../../infrastructure/external-services/openweathermap/openweathermap.handler';
 

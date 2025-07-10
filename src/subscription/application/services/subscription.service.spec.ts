@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
-import { MailBuilderService } from '../../infrastructure/services/mail-builder.service';
+import { MailBuilderService } from '../services/mail-builder.service';
 
 import { SubscriptionService } from './subscription.service';
 

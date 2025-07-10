@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
 import { WeatherResponse } from '../../../domain/entities/weather.interface';
-import { BaseWeatherHandler } from '../../../domain/chains/base-weather.handler';
+import { BaseWeatherHandler } from '../../chains/base-weather.handler';
 
 @Injectable()
 export class WeatherApiHandler extends BaseWeatherHandler {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { WeatherResponse } from '../../domain/entities/weather.interface';
 import { WeatherApi } from '../../domain/interfaces/weather-api.interface';
-import { WeatherChain } from '../../domain/chains/weather.chain';
+import { WeatherChain } from '../../infrastructure/chains/weather.chain';
 
 @Injectable()
 export class WeatherService implements WeatherApi {

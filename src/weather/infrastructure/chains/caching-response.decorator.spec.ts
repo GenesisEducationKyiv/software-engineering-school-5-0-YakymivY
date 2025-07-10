@@ -1,6 +1,6 @@
-import { WeatherResponse } from '../entities/weather.interface';
+import { WeatherResponse } from '../../domain/entities/weather.interface';
 import { CachingService } from '../../../common/services/caching.service';
-import { WeatherProvider } from '../interfaces/weather-provider.interface';
+import { WeatherProvider } from '../../domain/interfaces/weather-provider.interface';
 import { MetricsService } from '../../../common/services/metrics.service';
 
 import { CachingResponseDecorator } from './caching-response.decorator';

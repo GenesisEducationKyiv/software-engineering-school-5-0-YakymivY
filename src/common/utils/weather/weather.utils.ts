@@ -1,5 +1,5 @@
 import { fileLogger } from '../../../../logger.file';
-import { WeatherResponse } from '../entities/weather.interface';
+import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
 
 export function formEmailContent(
   weather: WeatherResponse,

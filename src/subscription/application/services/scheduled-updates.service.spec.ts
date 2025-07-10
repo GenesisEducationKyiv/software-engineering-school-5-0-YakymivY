@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
-import { MailBuilderService } from '../../infrastructure/services/mail-builder.service';
+import { MailBuilderService } from '../services/mail-builder.service';
 
 import { ScheduledUpdatesService } from './scheduled-updates.service';
 import { SubscriptionService } from './subscription.service';

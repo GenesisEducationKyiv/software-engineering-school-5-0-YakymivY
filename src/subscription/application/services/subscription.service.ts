@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { SubscriptionDto } from '../dtos/subscription.dto';
 import { Subscription } from '../../domain/entities/subscription.entity';
-import { MailBuilderService } from '../../infrastructure/services/mail-builder.service';
+import { MailBuilderService } from '../services/mail-builder.service';
 
 @Injectable()
 export class SubscriptionService {

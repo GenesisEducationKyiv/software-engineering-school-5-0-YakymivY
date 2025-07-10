@@ -6,7 +6,7 @@ import { SubscriptionModule } from '../subscription/subscription.module';
 
 import { WeatherService } from './application/services/weather.service';
 import { WeatherController } from './presentation/controllers/weather.controller';
-import { WeatherChain } from './domain/chains/weather.chain';
+import { WeatherChain } from './infrastructure/chains/weather.chain';
 import { WeatherApiHandler } from './infrastructure/external-services/weatherapi/weather-api.handler';
 import { OpenWeatherMapHandler } from './infrastructure/external-services/openweathermap/openweathermap.handler';
 

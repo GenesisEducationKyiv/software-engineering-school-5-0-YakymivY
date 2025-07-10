@@ -4,7 +4,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
 import { WeatherApi } from '../../../weather/domain/interfaces/weather-api.interface';
-import { MailBuilderService } from '../../infrastructure/services/mail-builder.service';
+import { MailBuilderService } from '../services/mail-builder.service';
 
 import { SubscriptionService } from './subscription.service';
 

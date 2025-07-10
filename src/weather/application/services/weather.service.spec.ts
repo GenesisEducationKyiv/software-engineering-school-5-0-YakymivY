@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { WeatherChain } from '../../domain/chains/weather.chain';
+import { WeatherChain } from '../../infrastructure/chains/weather.chain';
 import { WeatherResponse } from '../../domain/entities/weather.interface';
 
 import { WeatherService } from './weather.service';

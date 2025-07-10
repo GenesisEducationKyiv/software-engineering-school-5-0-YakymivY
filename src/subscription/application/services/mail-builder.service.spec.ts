@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
-import { Mailer } from '../interfaces/mailer.interface';
+import { Mailer } from '../../infrastructure/interfaces/mailer.interface';
 import { Subscription } from '../../domain/entities/subscription.entity';
 import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
 

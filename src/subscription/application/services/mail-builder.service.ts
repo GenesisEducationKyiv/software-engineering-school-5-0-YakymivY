@@ -1,8 +1,8 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { Mailer } from '../interfaces/mailer.interface';
-import { formEmailContent } from '../../../weather/domain/utils/weather.utils';
+import { Mailer } from '../../infrastructure/interfaces/mailer.interface';
+import { formEmailContent } from '../../../common/utils/weather/weather.utils';
 import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
 import { Subscription } from '../../domain/entities/subscription.entity';
 

@@ -1,6 +1,6 @@
-import { WeatherResponse } from '../entities/weather.interface';
-import { logResponse } from '../utils/weather.utils';
-import { WeatherProvider } from '../interfaces/weather-provider.interface';
+import { WeatherResponse } from '../../domain/entities/weather.interface';
+import { logResponse } from '../../../common/utils/weather/weather.utils';
+import { WeatherProvider } from '../../domain/interfaces/weather-provider.interface';
 
 export abstract class BaseWeatherHandler implements WeatherProvider {
   private nextProvider: WeatherProvider | null = null;

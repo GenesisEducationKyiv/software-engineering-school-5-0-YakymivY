@@ -10,7 +10,7 @@ import { SubscriptionController } from './presentation/controllers/subscription.
 import { Subscription } from './domain/entities/subscription.entity';
 import { MailService } from './infrastructure/services/mail.service';
 import { ScheduledUpdatesService } from './application/services/scheduled-updates.service';
-import { MailBuilderService } from './infrastructure/services/mail-builder.service';
+import { MailBuilderService } from './application/services/mail-builder.service';
 
 @Module({
   imports: [
