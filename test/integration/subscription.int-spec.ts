@@ -6,7 +6,7 @@ import * as request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
 
 import { AppModule } from '../../src/app.module';
-import { Subscription } from '../../src/subscription/entities/subscription.entity';
+import { Subscription } from '../../src/subscription/domain/entities/subscription.entity';
 
 import { configureApp } from './configure-app';
 

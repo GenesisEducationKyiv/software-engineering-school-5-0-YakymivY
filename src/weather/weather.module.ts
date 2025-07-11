@@ -4,11 +4,11 @@ import { HttpModule } from '@nestjs/axios';
 import { CommonModule } from '../common/common.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
 
-import { WeatherService } from './services/weather.service';
-import { WeatherController } from './controllers/weather.controller';
-import { WeatherChain } from './weather.chain';
-import { WeatherApiHandler } from './handlers/weather-api.handler';
-import { OpenWeatherMapHandler } from './handlers/openweathermap.handler';
+import { WeatherService } from './application/services/weather.service';
+import { WeatherController } from './presentation/controllers/weather.controller';
+import { WeatherChain } from './infrastructure/chains/weather.chain';
+import { WeatherApiHandler } from './infrastructure/external-services/weatherapi/weather-api.handler';
+import { OpenWeatherMapHandler } from './infrastructure/external-services/openweathermap/openweathermap.handler';
 
 @Module({
   imports: [HttpModule, forwardRef(() => SubscriptionModule), CommonModule],

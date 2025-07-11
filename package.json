@@ -22,6 +22,7 @@
     "test:e2e:start": "DB_HOST=test_db DB_PORT=5433 REDIS_HOST=test_redis docker compose -f docker-compose.test.yml --env-file .env.test up -d --wait",
     "test:e2e": "NODE_ENV=test DB_HOST=test_db DB_PORT=5433 REDIS_HOST=test_redis npx playwright test --config playwright.config.ts",
     "test:e2e:stop": "docker compose -f docker-compose.test.yml down -v",
+    "test:arch": "jest test/architecture --config jest.architecture.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:generate": "npm run build && typeorm migration:generate src/migrations/InitSchema -d dist/data-source.js",
     "migration:run": "typeorm migration:run -d dist/data-source.js",
@@ -87,6 +88,7 @@
     "ts-jest": "^29.3.4",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
+    "tsarch": "^5.4.1",
     "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.24",
     "typescript": "^5.1.3"
