@@ -1,14 +1,26 @@
 services:
   app:
-    build: .
-    command: sh -c "npm run migration:run && npm run start:prod"
+    build: 
+      context: .
+      dockerfile: apps/weather-app/Dockerfile
     ports:
       - 3000:3000
     env_file:
-      - .env
+      - ./apps/weather-app/.env
     depends_on:
       - db
       - redis
+      - mail
+
+  mail:
+    build: 
+      context: .
+      dockerfile: apps/mail/Dockerfile
+    ports:
+      - 4000:4000
+    env_file:
+      - ./apps/mail/.env
+
   db:
     image: postgres:15
     restart: always
@@ -30,10 +42,6 @@ services:
     image: redis:alpine
     ports:
       - ${REDIS_PORT}:6379
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASS}
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
