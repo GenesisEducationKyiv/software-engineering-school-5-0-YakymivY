@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+COPY apps/weather-app/public ./apps/public
 
 RUN npm run build weather-app
 
@@ -18,7 +19,8 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY apps/mail/entrypoint.sh ./entrypoint.sh
+COPY --from=builder /app/apps/weather-app/public ./dist/apps/public
+COPY apps/weather-app/entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh
 

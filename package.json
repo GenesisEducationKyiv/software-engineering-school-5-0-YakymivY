@@ -9,8 +9,8 @@
     "build": "nest build",
     "postbuild": "[ -d public ] && cp -r public dist/ || echo 'No public directory to copy'",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
-    "start:mail": "nest start mail",
-    "start:weather-app": "nest start weather-app",
+    "start:mail": "node dist/apps/mail/main",
+    "start:weather-app": "node dist/apps/weather-app/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
@@ -25,9 +25,9 @@
     "test:e2e:stop": "docker compose -f docker-compose.test.yml down -v",
     "test:arch": "jest test/architecture --config jest.architecture.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "npm run build && typeorm migration:generate src/migrations/InitSchema -d dist/data-source.js",
-    "migration:run": "typeorm migration:run -d dist/data-source.js",
-    "migration:revert": "typeorm migration:revert -d dist/data-source.js"
+    "migration:generate": "npm run build && typeorm migration:generate src/migrations/InitSchema -d dist/apps/weather-app/config/data-source.js",
+    "migration:run": "typeorm migration:run -d dist/apps/weather-app/config/data-source.js",
+    "migration:revert": "typeorm migration:revert -d dist/apps/weather-app/config/data-source.js"
   },
   "dependencies": {
     "@eslint/eslintrc": "^2.1.4",

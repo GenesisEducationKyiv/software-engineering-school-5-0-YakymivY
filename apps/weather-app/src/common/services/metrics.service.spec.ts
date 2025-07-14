@@ -1,11 +1,11 @@
 import { Counter } from 'prom-client';
 
-import { consoleLogger } from '../../../../../logger.console';
+import { consoleLogger } from '../utils/logger/logger.console';
 
 import { MetricsService } from './metrics.service';
 
 jest.mock('prom-client');
-jest.mock('../../../logger.console', () => ({
+jest.mock('../utils/logger/logger.console', () => ({
   consoleLogger: {
     error: jest.fn(),
   },

@@ -8,9 +8,10 @@ services:
     env_file:
       - ./apps/weather-app/.env
     depends_on:
-      - db
-      - redis
-      - mail
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   mail:
     build: 
@@ -38,6 +39,7 @@ services:
       start_period: 10s
     volumes:
       - pg_data:/var/lib/postgresql/data
+
   redis:
     image: redis:alpine
     ports:

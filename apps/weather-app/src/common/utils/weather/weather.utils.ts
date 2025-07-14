@@ -1,4 +1,4 @@
-import { fileLogger } from '../../../../../../logger.file';
+import { fileLogger } from '../../utils/logger/logger.file';
 import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
 
 export function formEmailContent(
