@@ -7,13 +7,13 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "postbuild": "[ -d public ] && cp -r public dist/ || echo 'No public directory to copy'",
+    "postbuild": "[ -d apps/weather-app/public ] && cp -r apps/weather-app/public dist/apps/weather-app/public || echo 'No public directory to copy'",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
-    "start:mail": "node dist/apps/mail/main",
-    "start:weather-app": "node dist/apps/weather-app/main",
+    "start:mail": "node dist/apps/mail/src/main",
+    "start:weather-app": "node dist/apps/weather-app/src/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/src/main",
+    "start:prod": "node dist/apps/weather-app/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "NODE_ENV=test jest --config jest.config.ts",
@@ -25,12 +25,14 @@
     "test:e2e:stop": "docker compose -f docker-compose.test.yml down -v",
     "test:arch": "jest test/architecture --config jest.architecture.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "npm run build && typeorm migration:generate src/migrations/InitSchema -d dist/apps/weather-app/config/data-source.js",
-    "migration:run": "typeorm migration:run -d dist/apps/weather-app/config/data-source.js",
-    "migration:revert": "typeorm migration:revert -d dist/apps/weather-app/config/data-source.js"
+    "migration:generate": "npm run build && typeorm migration:generate src/migrations/InitSchema -d dist/apps/weather-app/src/config/data-source.js",
+    "migration:run": "typeorm migration:run -d dist/apps/weather-app/src/config/data-source.js",
+    "migration:revert": "typeorm migration:revert -d dist/apps/weather-app/src/config/data-source.js"
   },
   "dependencies": {
     "@eslint/eslintrc": "^2.1.4",
+    "@grpc/grpc-js": "^1.13.4",
+    "@grpc/proto-loader": "^0.7.15",
     "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs/axios": "^4.0.0",
     "@nestjs/cache-manager": "^3.0.1",
@@ -79,6 +81,7 @@
     "ajv": "^6.12.6",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.4.1",
     "jest": "^29.7.0",
@@ -90,6 +93,7 @@
     "ts-jest": "^29.3.4",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
+    "ts-proto": "^2.7.5",
     "tsarch": "^5.4.1",
     "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.24",
@@ -112,8 +116,12 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+    }
   },
   "overrides": {
     "json-schema-traverse": "1.0.0"

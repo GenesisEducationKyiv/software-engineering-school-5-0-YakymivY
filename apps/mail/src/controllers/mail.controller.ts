@@ -1,8 +1,25 @@
 import { Controller } from '@nestjs/common';
 
-import { MailService } from '../services/mail.service';
+import {
+  MailServiceController,
+  MailServiceControllerMethods,
+  SendConfirmationEmailRequest,
+  SendConfirmationEmailResponse,
+} from '@app/common';
+
+import { MailBuilderService } from '../services/mail-builder.service';
 
 @Controller()
-export class MailController {
-  constructor(private readonly mailService: MailService) {}
+@MailServiceControllerMethods()
+export class MailController implements MailServiceController {
+  constructor(private readonly mailBuilderService: MailBuilderService) {}
+
+  async sendConfirmationEmail(
+    confirmationData: SendConfirmationEmailRequest,
+  ): Promise<SendConfirmationEmailResponse> {
+    return {
+      success:
+        await this.mailBuilderService.sendConfirmationEmail(confirmationData),
+    };
+  }
 }

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package mail;
+
+service MailService {
+  rpc SendConfirmationEmail(SendConfirmationEmailRequest) returns (SendConfirmationEmailResponse);
+}
+
+message SendConfirmationEmailRequest {
+  string email = 1;
+  string token = 2;
+}
+
+message SendConfirmationEmailResponse {
+  bool success = 1;
+}
