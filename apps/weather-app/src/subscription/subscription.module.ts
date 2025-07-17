@@ -11,9 +11,7 @@ import { WeatherService } from '../weather/application/services/weather.service'
 import { SubscriptionService } from './application/services/subscription.service';
 import { SubscriptionController } from './presentation/controllers/subscription.controller';
 import { Subscription } from './domain/entities/subscription.entity';
-import { MailService } from './infrastructure/services/mail.service';
 import { ScheduledUpdatesService } from './application/services/scheduled-updates.service';
-import { MailBuilderService } from './application/services/mail-builder.service';
 import { MailClientService } from './infrastructure/services/mail-client.service';
 
 @Module({
@@ -40,14 +38,9 @@ import { MailClientService } from './infrastructure/services/mail-client.service
       provide: 'WeatherApi',
       useClass: WeatherService,
     },
-    {
-      provide: 'Mailer',
-      useClass: MailService,
-    },
-    MailBuilderService,
     MailClientService,
   ],
   controllers: [SubscriptionController],
-  exports: [SubscriptionService, 'Mailer'],
+  exports: [SubscriptionService],
 })
 export class SubscriptionModule {}

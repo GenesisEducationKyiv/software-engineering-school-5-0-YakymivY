@@ -19,21 +19,51 @@ export interface SendConfirmationEmailResponse {
   success: boolean;
 }
 
+export interface SendWeatherUpdateEmailRequest {
+  weather: Weather | undefined;
+  subscription: Subscription | undefined;
+}
+
+export interface SendWeatherUpdateEmailResponse {
+  success: boolean;
+}
+
+export interface Weather {
+  temperature: number;
+  humidity: number;
+  description: string;
+}
+
+export interface Subscription {
+  email: string;
+  city: string;
+  token: string;
+}
+
 export const MAIL_PACKAGE_NAME = "mail";
 
 export interface MailServiceClient {
   sendConfirmationEmail(request: SendConfirmationEmailRequest): Observable<SendConfirmationEmailResponse>;
+
+  sendWeatherUpdateEmail(request: SendWeatherUpdateEmailRequest): Observable<SendWeatherUpdateEmailResponse>;
 }
 
 export interface MailServiceController {
   sendConfirmationEmail(
     request: SendConfirmationEmailRequest,
   ): Promise<SendConfirmationEmailResponse> | Observable<SendConfirmationEmailResponse> | SendConfirmationEmailResponse;
+
+  sendWeatherUpdateEmail(
+    request: SendWeatherUpdateEmailRequest,
+  ):
+    | Promise<SendWeatherUpdateEmailResponse>
+    | Observable<SendWeatherUpdateEmailResponse>
+    | SendWeatherUpdateEmailResponse;
 }
 
 export function MailServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["sendConfirmationEmail"];
+    const grpcMethods: string[] = ["sendConfirmationEmail", "sendWeatherUpdateEmail"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("MailService", method)(constructor.prototype[method], method, descriptor);

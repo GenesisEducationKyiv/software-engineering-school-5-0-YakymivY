@@ -14,7 +14,7 @@ import { Frequency } from '../../../common/enums/frequency.enum';
 import { SubscriptionDto } from '../dtos/subscription.dto';
 import { Subscription } from '../../domain/entities/subscription.entity';
 
-import { MailBuilderService } from './mail-builder.service';
+import { MailClientService } from './../../infrastructure/services/mail-client.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -24,7 +24,7 @@ export class SubscriptionService {
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-    private readonly mailBuilderService: MailBuilderService,
+    private readonly mailClientService: MailClientService,
     private configService: ConfigService,
   ) {
     this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
@@ -57,7 +57,10 @@ export class SubscriptionService {
 
       await this.subscriptionRepository.save(subscription);
 
-      await this.mailBuilderService.sendConfirmationEmail(email, token);
+      this.mailClientService.sendConfirmationEmail({
+        email,
+        token,
+      });
 
       return {
         message: 'Subscription successful. Confirmation email sent.',
