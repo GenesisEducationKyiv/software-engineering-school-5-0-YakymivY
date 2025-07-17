@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
+import { MailClientService } from '../../infrastructure/services/mail-client.service';
 
-import { MailBuilderService } from './mail-builder.service';
 import { ScheduledUpdatesService } from './scheduled-updates.service';
 import { SubscriptionService } from './subscription.service';
 
@@ -26,7 +26,7 @@ describe('ScheduledUpdatesService', () => {
           },
         },
         {
-          provide: MailBuilderService,
+          provide: MailClientService,
           useValue: {
             sendWeatherUpdateEmail: mockSendWeatherUpdateEmail,
           },
@@ -63,14 +63,14 @@ describe('ScheduledUpdatesService', () => {
       await service.sendHourlyUpdates();
 
       expect(mockGetActiveSubscriptions).toHaveBeenCalledWith(Frequency.HOURLY);
-      expect(mockSendWeatherUpdateEmail).toHaveBeenCalledWith(
-        {
+      expect(mockSendWeatherUpdateEmail).toHaveBeenCalledWith({
+        weather: {
           temperature: 25,
           humidity: 55,
           description: 'Partly cloudy',
         },
-        subs[0],
-      );
+        subscription: subs[0],
+      });
     });
   });
 
@@ -94,14 +94,14 @@ describe('ScheduledUpdatesService', () => {
       await service.sendDailyUpdates();
 
       expect(mockGetActiveSubscriptions).toHaveBeenCalledWith(Frequency.DAILY);
-      expect(mockSendWeatherUpdateEmail).toHaveBeenCalledWith(
-        {
+      expect(mockSendWeatherUpdateEmail).toHaveBeenCalledWith({
+        weather: {
           temperature: 15,
           humidity: 65,
           description: 'Cloudy',
         },
-        subs[0],
-      );
+        subscription: subs[0],
+      });
     });
   });
 });

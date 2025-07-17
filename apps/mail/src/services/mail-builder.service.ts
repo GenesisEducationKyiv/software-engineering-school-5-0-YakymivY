@@ -5,8 +5,8 @@ import {
   SendConfirmationEmailRequest,
   SendWeatherUpdateEmailRequest,
 } from '@app/common';
-import { formEmailContent } from 'apps/weather-app/src/common/utils/weather/weather.utils';
 
+import { formEmailContent } from '../common/mail.utils';
 import { Mailer } from '../interfaces/mailer.interface';
 
 @Injectable()

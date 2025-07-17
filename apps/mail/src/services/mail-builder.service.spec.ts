@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 
-import { Frequency } from '../../../common/enums/frequency.enum';
-import { Mailer } from '../../infrastructure/interfaces/mailer.interface';
-import { Subscription } from '../../domain/entities/subscription.entity';
-import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
+import { SendWeatherUpdateEmailRequest } from '@app/common';
+
+import { Mailer } from '../interfaces/mailer.interface';
 
 import { MailBuilderService } from './mail-builder.service';
 
@@ -12,7 +11,7 @@ describe('MailBuilderService', () => {
   let service: MailBuilderService;
   let mockMailer: jest.Mocked<Mailer>;
 
-  const BASE_URL = 'http://localhost:3000';
+  const BASE_URL = 'http://localhost:3000/api';
 
   const mockConfigService = {
     getOrThrow: jest.fn().mockReturnValue(BASE_URL),
@@ -43,7 +42,7 @@ describe('MailBuilderService', () => {
       const email = 'test@example.com';
       const token = 'test-token';
 
-      await service.sendConfirmationEmail(email, token);
+      await service.sendConfirmationEmail({ email, token });
 
       expect(mockMailer.sendMail).toHaveBeenCalledWith(
         email,
@@ -58,7 +57,10 @@ describe('MailBuilderService', () => {
 
       const loggerSpy = jest.spyOn(console, 'error').mockImplementation();
 
-      await service.sendConfirmationEmail('test@example.com', 'token');
+      await service.sendConfirmationEmail({
+        email: 'test@example.com',
+        token: 'token',
+      });
 
       expect(mockMailer.sendMail).toHaveBeenCalled();
       loggerSpy.mockRestore();
@@ -67,28 +69,25 @@ describe('MailBuilderService', () => {
 
   describe('sendWeatherUpdateEmail', () => {
     it('should send weather update email with correct content', async () => {
-      const weather: WeatherResponse = {
-        temperature: 20,
-        humidity: 10,
-        description: 'Sunny',
+      const weatherData: SendWeatherUpdateEmailRequest = {
+        weather: {
+          temperature: 20,
+          humidity: 10,
+          description: 'Sunny',
+        },
+        subscription: {
+          email: 'test@example.com',
+          city: 'Kyiv',
+          token: 'token123',
+        },
       };
 
-      const subscription: Subscription = {
-        id: '1',
-        email: 'test@example.com',
-        city: 'Kyiv',
-        frequency: Frequency.DAILY,
-        token: 'token123',
-        confirmed: true,
-        createdAt: new Date(),
-      };
-
-      await service.sendWeatherUpdateEmail(weather, subscription);
+      await service.sendWeatherUpdateEmail(weatherData);
 
       expect(mockMailer.sendMail).toHaveBeenCalledWith(
-        subscription.email,
+        weatherData.subscription.email,
         'Weather Update',
-        expect.stringContaining(subscription.city),
+        expect.stringContaining(weatherData.subscription.city),
       );
     });
 
@@ -97,23 +96,20 @@ describe('MailBuilderService', () => {
 
       const loggerSpy = jest.spyOn(console, 'error').mockImplementation();
 
-      const weather: WeatherResponse = {
-        temperature: 15,
-        humidity: 20,
-        description: 'Rainy',
+      const weatherData: SendWeatherUpdateEmailRequest = {
+        weather: {
+          temperature: 15,
+          humidity: 20,
+          description: 'Rainy',
+        },
+        subscription: {
+          email: 'user@example.com',
+          city: 'Lviv',
+          token: 'token987',
+        },
       };
 
-      const subscription: Subscription = {
-        id: '2',
-        email: 'user@example.com',
-        city: 'Lviv',
-        frequency: Frequency.DAILY,
-        token: 'token987',
-        confirmed: true,
-        createdAt: new Date(),
-      };
-
-      await service.sendWeatherUpdateEmail(weather, subscription);
+      await service.sendWeatherUpdateEmail(weatherData);
 
       expect(mockMailer.sendMail).toHaveBeenCalled();
       loggerSpy.mockRestore();

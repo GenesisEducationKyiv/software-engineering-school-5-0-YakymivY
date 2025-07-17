@@ -43,7 +43,7 @@ describe('WeatherService', () => {
 
     weatherChain.handler.getCurrentWeather.mockResolvedValueOnce(mockWeather);
 
-    const result = await service.getCurrentWeather(city);
+    const result = await service.getCityWeather(city);
 
     expect(weatherChain.handler.getCurrentWeather).toHaveBeenCalledWith(city);
     expect(result).toEqual(mockWeather);
@@ -55,7 +55,7 @@ describe('WeatherService', () => {
 
     weatherChain.handler.getCurrentWeather.mockRejectedValueOnce(error);
 
-    await expect(service.getCurrentWeather(city)).rejects.toThrow(
+    await expect(service.getCityWeather(city)).rejects.toThrow(
       'City not found',
     );
   });

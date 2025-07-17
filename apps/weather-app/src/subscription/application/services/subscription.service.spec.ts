@@ -10,14 +10,14 @@ import { ConfigService } from '@nestjs/config';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
+import { MailClientService } from '../../infrastructure/services/mail-client.service';
 
-import { MailBuilderService } from './mail-builder.service';
 import { SubscriptionService } from './subscription.service';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let repository: jest.Mocked<Repository<Subscription>>;
-  let mailBuilderService: jest.Mocked<MailBuilderService>;
+  let mailClientService: jest.Mocked<MailClientService>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -40,14 +40,14 @@ describe('SubscriptionService', () => {
       providers: [
         SubscriptionService,
         { provide: getRepositoryToken(Subscription), useValue: mockRepository },
-        { provide: MailBuilderService, useValue: mockMailService },
+        { provide: MailClientService, useValue: mockMailService },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     service = module.get<SubscriptionService>(SubscriptionService);
     repository = module.get(getRepositoryToken(Subscription));
-    mailBuilderService = module.get(MailBuilderService);
+    mailClientService = module.get(MailClientService);
   });
 
   describe('createSubscription', () => {
@@ -69,7 +69,6 @@ describe('SubscriptionService', () => {
 
       repository.create.mockReturnValue(createdSubscription);
       repository.save.mockResolvedValue(createdSubscription);
-      mailBuilderService.sendConfirmationEmail.mockResolvedValue(undefined);
 
       const result = await service.createSubscription(subscriptionDto);
 
@@ -86,7 +85,7 @@ describe('SubscriptionService', () => {
 
       expect(repository.save).toHaveBeenCalledWith(createdSubscription);
 
-      expect(mailBuilderService.sendConfirmationEmail).toHaveBeenCalled();
+      expect(mailClientService.sendConfirmationEmail).toHaveBeenCalled();
 
       expect(result).toEqual({
         message: 'Subscription successful. Confirmation email sent.',
