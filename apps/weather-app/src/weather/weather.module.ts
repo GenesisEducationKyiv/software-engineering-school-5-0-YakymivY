@@ -9,6 +9,7 @@ import { WeatherController } from './presentation/controllers/weather.controller
 import { WeatherChain } from './infrastructure/chains/weather.chain';
 import { WeatherApiHandler } from './infrastructure/external-services/weatherapi/weather-api.handler';
 import { OpenWeatherMapHandler } from './infrastructure/external-services/openweathermap/openweathermap.handler';
+import { WeatherFacade } from './weather.facade';
 
 @Module({
   imports: [HttpModule, forwardRef(() => SubscriptionModule), CommonModule],
@@ -16,11 +17,12 @@ import { OpenWeatherMapHandler } from './infrastructure/external-services/openwe
     WeatherService,
     {
       provide: 'WeatherApi',
-      useClass: WeatherService,
+      useClass: WeatherFacade,
     },
     WeatherChain,
     WeatherApiHandler,
     OpenWeatherMapHandler,
+    WeatherFacade,
   ],
   controllers: [WeatherController],
   exports: [

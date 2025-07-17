@@ -6,7 +6,6 @@ import { HttpModule } from '@nestjs/axios';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { WeatherModule } from '../weather/weather.module';
-import { WeatherService } from '../weather/application/services/weather.service';
 
 import { SubscriptionService } from './application/services/subscription.service';
 import { SubscriptionController } from './presentation/controllers/subscription.controller';
@@ -31,15 +30,7 @@ import { MailClientService } from './infrastructure/services/mail-client.service
       },
     ]),
   ],
-  providers: [
-    SubscriptionService,
-    ScheduledUpdatesService,
-    {
-      provide: 'WeatherApi',
-      useClass: WeatherService,
-    },
-    MailClientService,
-  ],
+  providers: [SubscriptionService, ScheduledUpdatesService, MailClientService],
   controllers: [SubscriptionController],
   exports: [SubscriptionService],
 })
