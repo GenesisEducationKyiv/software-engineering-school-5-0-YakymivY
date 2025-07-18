@@ -7,7 +7,7 @@ import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 
-import { AppModule } from '../../src/app.module';
+import { AppModule } from '../../apps/weather-app/src/app.module';
 
 import { configureApp } from './configure-app';
 

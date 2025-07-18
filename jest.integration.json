@@ -5,6 +5,9 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
+  "moduleNameMapper": {
+    "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+  },
   "setupFiles": ["<rootDir>/test/integration/setup.ts"],
   "preset": "ts-jest",
   "testEnvironment": "node",
