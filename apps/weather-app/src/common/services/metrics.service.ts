@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Counter } from 'prom-client';
 
-import { consoleLogger } from '../utils/logger/logger.console';
+import { consoleLogger } from '@app/common';
 
 @Injectable()
 export class MetricsService {

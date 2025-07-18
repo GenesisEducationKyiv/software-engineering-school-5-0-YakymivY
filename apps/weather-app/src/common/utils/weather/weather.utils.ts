@@ -1,4 +1,5 @@
-import { fileLogger } from '../../utils/logger/logger.file';
+import { fileLogger } from '@app/common';
+
 import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
 
 export function logResponse(provider: string, response: WeatherResponse): void {

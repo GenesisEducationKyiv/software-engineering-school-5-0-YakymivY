@@ -19,8 +19,8 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY apps/weather-app/entrypoint.sh ./entrypoint.sh
-COPY proto ./proto
+COPY --from=builder /app/apps/weather-app/entrypoint.sh ./entrypoint.sh
+COPY --from=builder /app/proto ./proto
 
 RUN chmod +x ./entrypoint.sh
 

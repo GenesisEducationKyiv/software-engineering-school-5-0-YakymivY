@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 
-import { consoleLogger } from '../utils/logger/logger.console';
+import { consoleLogger } from '@app/common';
 
 @Injectable()
 export class CachingService {
