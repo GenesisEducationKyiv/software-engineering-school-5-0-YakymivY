@@ -6,13 +6,15 @@ import * as request from 'supertest';
 import { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
+import { DataSource } from 'typeorm';
 
 import { AppModule } from '../../apps/weather-app/src/app.module';
 
-import { configureApp } from './configure-app';
+import { configureApp, resetDatabase } from './configure-app';
 
 describe('Weather API', () => {
   let app: INestApplication;
+  let dataSource: DataSource;
 
   const mockResponse: AxiosResponse = {
     data: {
@@ -47,10 +49,14 @@ describe('Weather API', () => {
 
     app = moduleFixture.createNestApplication();
     await configureApp(app);
+
+    dataSource = app.get(DataSource);
+    await resetDatabase(dataSource);
   });
 
   afterAll(async () => {
     if (app) await app.close();
+    if (dataSource && dataSource.isInitialized) await dataSource.destroy();
   });
 
   it('GET /api/weather - should return 200 and valid response', async () => {

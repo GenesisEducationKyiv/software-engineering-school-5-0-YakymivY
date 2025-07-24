@@ -10,5 +10,5 @@ export default new DataSource({
   database: process.env.DB_NAME,
   entities: ['dist/apps/weather-app/src//**/*.entity.js'],
   migrations: ['dist/apps/weather-app/src/migrations/*.js'],
-  synchronize: process.env.NODE_ENV === 'test',
+  synchronize: false,
 });

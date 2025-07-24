@@ -32,7 +32,7 @@ import { CommonModule } from './common/common.module';
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: process.env.NODE_ENV === 'test',
+        synchronize: false,
       }),
       inject: [ConfigService],
     }),
