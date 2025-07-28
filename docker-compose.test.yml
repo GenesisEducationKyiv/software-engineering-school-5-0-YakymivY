@@ -1,18 +1,31 @@
 services:
   app:
-    build: .
-    command: sh -c "npm run migration:run && npm run start:prod"
+    build: 
+      context: .
+      dockerfile: apps/weather-app/Dockerfile
+    command: npm run test:int
     ports:
       - 3000:3000
     env_file:
-      - .env.test
+      - ./apps/weather-app/.env.test
     depends_on:
       test_db:
         condition: service_healthy
       test_redis:
         condition: service_healthy
     environment:
-      NODE_ENV: test
+      - NODE_ENV=test
+    networks:
+      - test_network
+
+  mail:
+    build: 
+      context: .
+      dockerfile: apps/mail/Dockerfile
+    ports:
+      - 4000:4000
+    env_file:
+      - ./apps/mail/.env.test
     networks:
       - test_network
 
@@ -20,7 +33,7 @@ services:
     image: postgres:15
     restart: always
     env_file:
-      - .env.test
+      - ./apps/weather-app/.env.test
     ports:
       - ${DB_PORT}:5432
     volumes:

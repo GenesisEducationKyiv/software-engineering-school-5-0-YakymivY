@@ -38,6 +38,9 @@ jobs:
         run: npm run test
 
       # --- Integration Tests ---
+      - name: Start test containers
+        run: npm run test:integration:start:git
+
       - name: Run integration tests
         run: npm run test:integration
         env:
@@ -47,11 +50,14 @@ jobs:
           DB_HOST: localhost
           NODE_ENV: test
 
+      - name: Stop test containers
+        run: npm run test:integration:stop
+
       # --- E2E Tests ---
       - name: Install Playwright and Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
 
-      - name: Start test database
+      - name: Start test containers
         run: npm run test:e2e:start
 
       - name: Run E2E tests
@@ -63,7 +69,7 @@ jobs:
           DB_HOST: test_db
           NODE_ENV: test
 
-      - name: Stop test database
+      - name: Stop test containers
         run: npm run test:e2e:stop
 
       # --- Architecture Tests ---

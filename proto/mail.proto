@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package mail;
+
+service MailService {
+  rpc sendConfirmationEmail(SendConfirmationEmailRequest) returns (SendConfirmationEmailResponse);
+  rpc sendWeatherUpdateEmail(SendWeatherUpdateEmailRequest) returns (SendWeatherUpdateEmailResponse);
+}
+
+// sendConfirmationEmail
+
+message SendConfirmationEmailRequest {
+  string email = 1;
+  string token = 2;
+}
+
+message SendConfirmationEmailResponse {
+  bool success = 1;
+}
+
+// sendWeatherUpdateEmail
+
+message SendWeatherUpdateEmailRequest {
+  Weather weather = 1;
+  Subscription subscription = 2;
+}
+
+message SendWeatherUpdateEmailResponse {
+  bool success = 1;
+}
+
+message Weather {
+  float temperature = 1;
+  float humidity = 2;
+  string description = 3;
+}
+
+message Subscription {
+  string email = 1;
+  string city = 2;
+  string token = 3;
+}
