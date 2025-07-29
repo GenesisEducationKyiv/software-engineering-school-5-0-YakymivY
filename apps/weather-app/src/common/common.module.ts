@@ -21,7 +21,10 @@ import { MetricsService } from './services/metrics.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [CachingService, MetricsService],
-  exports: [CachingService, MetricsService],
+  providers: [
+    { provide: 'CachingService', useClass: CachingService },
+    { provide: 'MetricsService', useClass: MetricsService },
+  ],
+  exports: ['CachingService', 'MetricsService'],
 })
 export class CommonModule {}

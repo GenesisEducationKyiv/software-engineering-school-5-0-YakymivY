@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MailController } from './controllers/mail.controller';
 import { MailService } from './services/mail.service';
 import { MailBuilderService } from './services/mail-builder.service';
+import { MailEventController } from './controllers/mail-event.controller';
 
 @Module({
   imports: [
@@ -15,7 +16,10 @@ import { MailBuilderService } from './services/mail-builder.service';
           : 'apps/mail/.env',
     }),
   ],
-  controllers: [MailController],
-  providers: [{ provide: 'Mailer', useClass: MailService }, MailBuilderService],
+  controllers: [MailController, MailEventController],
+  providers: [
+    { provide: 'Mailer', useClass: MailService },
+    { provide: 'MailBuilder', useClass: MailBuilderService },
+  ],
 })
 export class MailModule {}

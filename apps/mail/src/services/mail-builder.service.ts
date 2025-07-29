@@ -8,9 +8,10 @@ import {
 
 import { formEmailContent } from '../common/mail.utils';
 import { Mailer } from '../interfaces/mailer.interface';
+import { MailBuilder } from '../interfaces/mail-builder.interface';
 
 @Injectable()
-export class MailBuilderService {
+export class MailBuilderService implements MailBuilder {
   private readonly logger = new Logger(MailBuilderService.name);
   private readonly baseUrl: string;
 
