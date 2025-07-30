@@ -127,7 +127,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1"
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/contracts(|/.*)$": "<rootDir>/libs/contracts/events/$1"
     }
   },
   "overrides": {
