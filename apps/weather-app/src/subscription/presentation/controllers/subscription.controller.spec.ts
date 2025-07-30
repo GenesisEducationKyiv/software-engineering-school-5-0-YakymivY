@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
-import { SubscriptionService } from '../../application/services/subscription.service';
 import { SubscriptionDto } from '../../application/dtos/subscription.dto';
 import { TokenDto } from '../../application/dtos/token.dto';
 
@@ -21,7 +20,7 @@ describe('SubscriptionController', () => {
       controllers: [SubscriptionController],
       providers: [
         {
-          provide: SubscriptionService,
+          provide: 'SubscriptionService',
           useValue: mockService,
         },
       ],

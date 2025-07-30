@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
-import { MetricsService } from '../../../common/services/metrics.service';
-import { CachingService } from '../../../common/services/caching.service';
 import { WeatherApiHandler } from '../external-services/weatherapi/weather-api.handler';
 import { OpenWeatherMapHandler } from '../external-services/openweathermap/openweathermap.handler';
+import { Caching } from '../../../common/interfaces/caching.interface';
+import { Metrics } from '../../../common/interfaces/metrics.interface';
 
 import { WeatherChain } from './weather.chain';
 
@@ -13,8 +13,8 @@ describe('WeatherChain', () => {
   let primaryHandler: WeatherApiHandler;
   let secondaryHandler: OpenWeatherMapHandler;
   let weatherChain: WeatherChain;
-  let cachingService: CachingService;
-  let metricsService: MetricsService;
+  let cachingService: Caching;
+  let metricsService: Metrics;
 
   const mockWeather = {
     temperature: 25,
@@ -39,11 +39,11 @@ describe('WeatherChain', () => {
           },
         },
         {
-          provide: CachingService,
+          provide: 'CachingService',
           useValue: { get: jest.fn(), set: jest.fn() },
         },
         {
-          provide: MetricsService,
+          provide: 'MetricsService',
           useValue: { trackCacheRequest: jest.fn() },
         },
       ],
@@ -52,8 +52,8 @@ describe('WeatherChain', () => {
     primaryHandler = module.get(WeatherApiHandler);
     secondaryHandler = module.get(OpenWeatherMapHandler);
     weatherChain = module.get(WeatherChain);
-    cachingService = module.get(CachingService);
-    metricsService = module.get(MetricsService);
+    cachingService = module.get('CachingService');
+    metricsService = module.get('MetricsService');
 
     weatherChain.onModuleInit(); // sets the chain
   });

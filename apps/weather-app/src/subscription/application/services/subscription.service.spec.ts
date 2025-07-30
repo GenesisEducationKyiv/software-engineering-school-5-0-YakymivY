@@ -10,14 +10,14 @@ import { ConfigService } from '@nestjs/config';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
-import { MailClientService } from '../../infrastructure/services/mail-client.service';
+import { MailService } from '../../infrastructure/interfaces/mail-service.interface';
 
 import { SubscriptionService } from './subscription.service';
 
 describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let repository: jest.Mocked<Repository<Subscription>>;
-  let mailClientService: jest.Mocked<MailClientService>;
+  let mailService: jest.Mocked<MailService>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -40,14 +40,14 @@ describe('SubscriptionService', () => {
       providers: [
         SubscriptionService,
         { provide: getRepositoryToken(Subscription), useValue: mockRepository },
-        { provide: MailClientService, useValue: mockMailService },
+        { provide: 'MailService', useValue: mockMailService },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     service = module.get<SubscriptionService>(SubscriptionService);
     repository = module.get(getRepositoryToken(Subscription));
-    mailClientService = module.get(MailClientService);
+    mailService = module.get('MailService');
   });
 
   describe('createSubscription', () => {
@@ -85,7 +85,7 @@ describe('SubscriptionService', () => {
 
       expect(repository.save).toHaveBeenCalledWith(createdSubscription);
 
-      expect(mailClientService.sendConfirmationEmail).toHaveBeenCalled();
+      expect(mailService.sendConfirmationEmail).toHaveBeenCalled();
 
       expect(result).toEqual({
         message: 'Subscription successful. Confirmation email sent.',

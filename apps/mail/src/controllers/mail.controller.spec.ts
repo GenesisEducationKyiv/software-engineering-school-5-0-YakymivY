@@ -5,13 +5,13 @@ import {
   SendWeatherUpdateEmailRequest,
 } from '@app/common';
 
-import { MailBuilderService } from '../services/mail-builder.service';
+import { MailBuilder } from '../interfaces/mail-builder.interface';
 
 import { MailController } from './mail.controller';
 
 describe('MailController', () => {
   let controller: MailController;
-  let mailBuilderService: MailBuilderService;
+  let mailBuilderService: MailBuilder;
 
   const mockMailBuilderService = {
     sendConfirmationEmail: jest.fn(),
@@ -23,14 +23,14 @@ describe('MailController', () => {
       controllers: [MailController],
       providers: [
         {
-          provide: MailBuilderService,
+          provide: 'MailBuilder',
           useValue: mockMailBuilderService,
         },
       ],
     }).compile();
 
     controller = module.get<MailController>(MailController);
-    mailBuilderService = module.get<MailBuilderService>(MailBuilderService);
+    mailBuilderService = module.get<MailBuilder>('MailBuilder');
   });
 
   afterEach(() => {
