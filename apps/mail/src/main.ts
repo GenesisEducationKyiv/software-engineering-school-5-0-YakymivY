@@ -12,6 +12,8 @@ async function bootstrap(): Promise<void> {
 
   const rabbitHost = configService.get<string>('RABBITMQ_HOST');
   const rabbitPort = configService.get<number>('RABBITMQ_PORT');
+  const rabbitUser = configService.get<string>('RABBITMQ_USER');
+  const rabbitPass = configService.get<string>('RABBITMQ_PASS');
 
   // gRPC microservice transport
   app.connectMicroservice<MicroserviceOptions>({
@@ -27,7 +29,16 @@ async function bootstrap(): Promise<void> {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://guest:guest@' + rabbitHost + ':' + rabbitPort],
+      urls: [
+        'amqp://' +
+          rabbitUser +
+          ':' +
+          rabbitPass +
+          '@' +
+          rabbitHost +
+          ':' +
+          rabbitPort,
+      ],
       queue: 'email_queue',
       queueOptions: { durable: true },
     },

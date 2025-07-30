@@ -13,6 +13,8 @@ services:
         condition: service_healthy
       test_redis:
         condition: service_healthy
+      test_rabbitmq:
+        condition: service_healthy
     environment:
       - NODE_ENV=test
     networks:
@@ -26,6 +28,9 @@ services:
       - 4000:4000
     env_file:
       - ./apps/mail/.env.test
+    depends_on:
+      test_rabbitmq:
+        condition: service_healthy
     networks:
       - test_network
 
@@ -61,6 +66,23 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
+    networks:
+      - test_network
+
+  test_rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - ${RABBITMQ_PORT}:5672
+      - ${RABBITMQ_MGMT_PORT}:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    healthcheck:
+      test: ['CMD', 'rabbitmqctl', 'status']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - test_network
 

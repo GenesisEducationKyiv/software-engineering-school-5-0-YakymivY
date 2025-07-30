@@ -53,7 +53,7 @@ import { MailEventService } from './infrastructure/services/mail-event.service';
           transport: Transport.RMQ,
           options: {
             urls: [
-              `amqp://guest:guest@${config.get<string>('RABBITMQ_HOST')}:${config.get<string>('RABBITMQ_PORT')}`,
+              `amqp://${config.get<string>('RABBITMQ_USER')}:${config.get<string>('RABBITMQ_PASS')}@${config.get<string>('RABBITMQ_HOST')}:${config.get<string>('RABBITMQ_PORT')}`,
             ],
             queue: 'email_queue',
             queueOptions: {
