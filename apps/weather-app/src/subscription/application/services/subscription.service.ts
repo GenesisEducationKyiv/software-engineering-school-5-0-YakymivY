@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   ConflictException,
@@ -8,27 +9,22 @@ import {
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { ConfigService } from '@nestjs/config';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { SubscriptionDto } from '../dtos/subscription.dto';
 import { Subscription } from '../../domain/entities/subscription.entity';
-
-import { MailClientService } from './../../infrastructure/services/mail-client.service';
+import { MailService } from '../../infrastructure/interfaces/mail-service.interface';
+import { SubscriptionHandler } from '../interfaces/subscription-handler.interface';
 
 @Injectable()
-export class SubscriptionService {
+export class SubscriptionService implements SubscriptionHandler {
   private readonly logger = new Logger(SubscriptionService.name);
-  private readonly baseUrl: string;
 
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-    private readonly mailClientService: MailClientService,
-    private configService: ConfigService,
-  ) {
-    this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
-  }
+    @Inject('MailService') private readonly mailService: MailService,
+  ) {}
 
   async createSubscription(
     subscriptionDto: SubscriptionDto,
@@ -57,7 +53,7 @@ export class SubscriptionService {
 
       await this.subscriptionRepository.save(subscription);
 
-      this.mailClientService.sendConfirmationEmail({
+      await this.mailService.sendConfirmationEmail({
         email,
         token,
       });

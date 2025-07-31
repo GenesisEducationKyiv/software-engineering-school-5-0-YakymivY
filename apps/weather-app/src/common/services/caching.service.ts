@@ -4,8 +4,10 @@ import { Redis } from 'ioredis';
 
 import { consoleLogger } from '@app/common';
 
+import { Caching } from '../interfaces/caching.interface';
+
 @Injectable()
-export class CachingService {
+export class CachingService implements Caching {
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   public async get<T>(key: string): Promise<T | null> {

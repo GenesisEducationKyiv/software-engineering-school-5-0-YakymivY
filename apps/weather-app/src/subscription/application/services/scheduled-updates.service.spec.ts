@@ -2,10 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
-import { MailClientService } from '../../infrastructure/services/mail-client.service';
 
 import { ScheduledUpdatesService } from './scheduled-updates.service';
-import { SubscriptionService } from './subscription.service';
 
 describe('ScheduledUpdatesService', () => {
   let service: ScheduledUpdatesService;
@@ -20,13 +18,13 @@ describe('ScheduledUpdatesService', () => {
       providers: [
         ScheduledUpdatesService,
         {
-          provide: SubscriptionService,
+          provide: 'SubscriptionService',
           useValue: {
             getActiveSubscriptions: mockGetActiveSubscriptions,
           },
         },
         {
-          provide: MailClientService,
+          provide: 'MailService',
           useValue: {
             sendWeatherUpdateEmail: mockSendWeatherUpdateEmail,
           },

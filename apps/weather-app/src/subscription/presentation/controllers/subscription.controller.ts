@@ -1,4 +1,5 @@
 import {
+  Inject,
   Controller,
   Post,
   Body,
@@ -11,9 +12,13 @@ import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { SubscriptionDto } from '../../application/dtos/subscription.dto';
 import { SubscriptionService } from '../../application/services/subscription.service';
 import { TokenDto } from '../../application/dtos/token.dto';
+
 @Controller('')
 export class SubscriptionController {
-  constructor(private readonly subscriptionService: SubscriptionService) {}
+  constructor(
+    @Inject('SubscriptionService')
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   @Post('subscribe')
   @UseInterceptors(AnyFilesInterceptor())

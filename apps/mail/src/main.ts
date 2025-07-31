@@ -2,21 +2,47 @@ import { join } from 'path';
 
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
 import { MailModule } from './mail.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    MailModule,
-    {
-      transport: Transport.GRPC,
-      options: {
-        package: 'mail',
-        protoPath: join(__dirname, '../proto/mail.proto'),
-        url: '0.0.0.0:4000',
-      },
+  const app = await NestFactory.create(MailModule);
+  const configService = app.get(ConfigService);
+
+  const rabbitHost = configService.get<string>('RABBITMQ_HOST');
+  const rabbitPort = configService.get<number>('RABBITMQ_PORT');
+  const rabbitUser = configService.get<string>('RABBITMQ_USER');
+  const rabbitPass = configService.get<string>('RABBITMQ_PASS');
+
+  // gRPC microservice transport
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: 'mail',
+      protoPath: join(__dirname, '../proto/mail.proto'),
+      url: '0.0.0.0:4000',
     },
-  );
-  await app.listen();
+  });
+
+  // RabbitMQ microservice transport
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [
+        'amqp://' +
+          rabbitUser +
+          ':' +
+          rabbitPass +
+          '@' +
+          rabbitHost +
+          ':' +
+          rabbitPort,
+      ],
+      queue: 'email_queue',
+      queueOptions: { durable: true },
+    },
+  });
+  await app.startAllMicroservices();
 }
 void bootstrap();

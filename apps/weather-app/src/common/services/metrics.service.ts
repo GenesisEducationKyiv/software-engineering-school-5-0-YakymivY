@@ -3,8 +3,10 @@ import { Counter } from 'prom-client';
 
 import { consoleLogger } from '@app/common';
 
+import { Metrics } from '../interfaces/metrics.interface';
+
 @Injectable()
-export class MetricsService {
+export class MetricsService implements Metrics {
   private counter: Counter;
 
   constructor() {

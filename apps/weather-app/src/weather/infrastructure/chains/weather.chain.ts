@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 
 // Services
 import { MetricsService } from '../../../common/services/metrics.service';
@@ -16,8 +16,8 @@ export class WeatherChain implements OnModuleInit {
   constructor(
     private readonly weatherApiHandler: WeatherApiHandler,
     private readonly openWeatherMapHandler: OpenWeatherMapHandler,
-    private readonly cachingService: CachingService,
-    private readonly metricsService: MetricsService,
+    @Inject('CachingService') private readonly cachingService: CachingService,
+    @Inject('MetricsService') private readonly metricsService: MetricsService,
   ) {}
 
   onModuleInit(): void {

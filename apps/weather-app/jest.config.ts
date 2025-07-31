@@ -12,6 +12,8 @@ const config: Config = {
     '^src/(.*)$': '<rootDir>/src/$1',
     '^@app/common$': '<rootDir>/../../../libs/common/src/index.ts',
     '^@app/common/(.*)$': '<rootDir>/../../../libs/common/src/$1',
+    '^@app/contracts$': '<rootDir>/../../../libs/contracts/events/index.ts',
+    '^@app/contracts/(.*)$': '<rootDir>/../../../libs/contracts/events/$1',
   },
   testEnvironment: 'node',
   setupFiles: ['../../../jest.setup.ts'],
