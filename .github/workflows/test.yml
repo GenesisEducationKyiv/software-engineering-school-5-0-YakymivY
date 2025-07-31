@@ -31,11 +31,11 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       # --- Unit Tests ---
-      # - name: Run unit tests
-      #   run: npm run test
+      - name: Run unit tests
+        run: npm run test
 
       # --- Integration Tests ---
       - name: Start test containers
