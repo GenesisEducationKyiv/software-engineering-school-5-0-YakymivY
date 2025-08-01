@@ -46,7 +46,6 @@ export class MailService implements Mailer {
       this.logger.error({
         to,
         subject,
-        html,
         message: 'Error occured when sending mail through SMTP',
         error,
       });
