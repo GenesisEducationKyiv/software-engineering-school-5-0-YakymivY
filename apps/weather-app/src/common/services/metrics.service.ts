@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Counter } from 'prom-client';
-
-import { consoleLogger } from '@app/common';
 
 import { Metrics } from '../interfaces/metrics.interface';
 
 @Injectable()
 export class MetricsService implements Metrics {
+  private readonly logger = new Logger(MetricsService.name);
+
   private counter: Counter;
 
   constructor() {
@@ -21,7 +21,11 @@ export class MetricsService implements Metrics {
     try {
       this.counter.labels(result).inc();
     } catch (error) {
-      consoleLogger.error('Error recording metric:', error);
+      this.logger.error({
+        result,
+        message: 'Error recording metric',
+        error,
+      });
     }
   }
 }

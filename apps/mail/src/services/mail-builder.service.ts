@@ -31,7 +31,11 @@ export class MailBuilderService implements MailBuilder {
       );
       return true;
     } catch (error) {
-      this.logger.error('Error sending confirmation email: ', error);
+      this.logger.error({
+        email,
+        message: 'Error sending confirmation email',
+        error,
+      });
       return false;
     }
   }
@@ -46,7 +50,12 @@ export class MailBuilderService implements MailBuilder {
       );
       return true;
     } catch (error) {
-      this.logger.error('Error sending weather update email: ', error);
+      this.logger.error({
+        email: subscription.email,
+        city: subscription.city,
+        message: 'Error sending weather update email',
+        error,
+      });
       return false;
     }
   }

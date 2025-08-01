@@ -1,12 +1,11 @@
 import { Counter } from 'prom-client';
-
-import { consoleLogger } from '@app/common';
+import { Logger } from '@nestjs/common';
 
 import { MetricsService } from './metrics.service';
 
 jest.mock('prom-client');
-jest.mock('@app/common', () => ({
-  consoleLogger: {
+jest.mock('@nestjs/common', () => ({
+  Logger: {
     error: jest.fn(),
   },
 }));
@@ -65,9 +64,6 @@ describe('MetricsService', () => {
     const failingService = new MetricsService();
     failingService.trackCacheRequest('hit');
 
-    expect(consoleLogger.error).toHaveBeenCalledWith(
-      'Error recording metric:',
-      error,
-    );
+    expect(Logger.error).toHaveBeenCalledWith('Error recording metric:', error);
   });
 });

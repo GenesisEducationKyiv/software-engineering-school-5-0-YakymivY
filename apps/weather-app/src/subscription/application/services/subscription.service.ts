@@ -38,6 +38,11 @@ export class SubscriptionService implements SubscriptionHandler {
       });
 
       if (existingEmail) {
+        this.logger.error({
+          userId: existingEmail.id,
+          email: existingEmail.email,
+          message: 'Email already subscribed',
+        });
         throw new ConflictException('Email already subscribed');
       }
 
@@ -65,7 +70,11 @@ export class SubscriptionService implements SubscriptionHandler {
       if (error instanceof ConflictException) {
         throw error;
       }
-      this.logger.error('Error creating subscription: ', error);
+      this.logger.error({
+        email: subscriptionDto.email,
+        message: 'Error creating subscription',
+        error,
+      });
       throw new InternalServerErrorException('Failed to create subscription');
     }
   }
@@ -78,12 +87,22 @@ export class SubscriptionService implements SubscriptionHandler {
       });
 
       if (!subscription) {
+        this.logger.error({
+          token,
+          message: 'Token not found for confirmation',
+        });
         throw new NotFoundException('Token not found');
       }
 
       // change status to confirmed
       subscription.confirmed = true;
       await this.subscriptionRepository.save(subscription);
+
+      this.logger.log({
+        userId: subscription.id,
+        email: subscription.email,
+        message: 'Subscription confirmed successfully',
+      });
 
       return {
         message: 'Subscription confirmed successfully',
@@ -92,7 +111,11 @@ export class SubscriptionService implements SubscriptionHandler {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error('Error confirming subscription: ', error);
+      this.logger.error({
+        token,
+        message: 'Error confirming subscription',
+        error,
+      });
       throw new InternalServerErrorException('Failed to confirm subscription');
     }
   }
@@ -105,11 +128,21 @@ export class SubscriptionService implements SubscriptionHandler {
       });
 
       if (!subscription) {
+        this.logger.error({
+          token,
+          message: 'Token not found for removal',
+        });
         throw new NotFoundException('Token not found');
       }
 
       // delete the subscription from db
       await this.subscriptionRepository.remove(subscription);
+
+      this.logger.log({
+        userId: subscription.id,
+        email: subscription.email,
+        message: 'Unsubscribed successfully',
+      });
 
       return {
         message: 'Unsubscribed successfully',
@@ -118,7 +151,11 @@ export class SubscriptionService implements SubscriptionHandler {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error('Error removing subscription: ', error);
+      this.logger.error({
+        token,
+        message: 'Error removing subscription',
+        error,
+      });
       throw new InternalServerErrorException('Failed to remove subscription');
     }
   }
@@ -130,9 +167,19 @@ export class SubscriptionService implements SubscriptionHandler {
         where: { confirmed: true, frequency },
       });
 
+      this.logger.log({
+        frequency,
+        message: 'Active subscriptions retrieved successfully',
+        subscriptions,
+      });
+
       return subscriptions;
     } catch (error) {
-      this.logger.error('Error getting active subscriptions: ', error);
+      this.logger.error({
+        frequency,
+        message: 'Error getting active subscriptions',
+        error,
+      });
       throw new InternalServerErrorException(
         'Failed to get active subscriptions',
       );
