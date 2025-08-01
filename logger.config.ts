@@ -16,6 +16,21 @@ const skipNestSystemLogs = winston.format((info) => {
   return info;
 });
 
+const samplingRate = {
+  debug: 0.1,
+  info: 0.5,
+};
+
+const samplingFormat = winston.format((info) => {
+  const level = info.level;
+  if (samplingRate[level] !== undefined) {
+    const keep = Math.random() < samplingRate[level];
+    return keep ? info : false;
+  }
+
+  return info;
+});
+
 export const winstonLoggerOptions: winston.LoggerOptions = {
   level: 'debug',
   format: winston.format.combine(
@@ -39,6 +54,7 @@ export const winstonLoggerOptions: winston.LoggerOptions = {
       filename: 'logs/app.log',
       format: winston.format.combine(
         skipNestSystemLogs(),
+        samplingFormat(),
         winston.format.json(),
       ),
     }),
@@ -48,6 +64,7 @@ export const winstonLoggerOptions: winston.LoggerOptions = {
       filename: 'logs/error.log',
       format: winston.format.combine(
         skipNestSystemLogs(),
+        samplingFormat(),
         winston.format.json(),
       ),
     }),
