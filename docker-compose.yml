@@ -21,6 +21,7 @@ services:
       dockerfile: apps/mail/Dockerfile
     ports:
       - 4000:4000
+      - 4001:4001
     env_file:
       - ./apps/mail/.env
     depends_on:
