@@ -51,6 +51,5 @@ async function bootstrap(): Promise<void> {
   await app.startAllMicroservices();
 
   await app.listen(process.env.PORT ?? 4001);
-  console.log('HTTP server listening on port 4001');
 }
 void bootstrap();

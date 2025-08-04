@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Counter, collectDefaultMetrics } from 'prom-client';
+import { Counter } from 'prom-client';
 
 import { Metrics } from '../../interfaces/metrics.interface';
 
@@ -10,8 +10,6 @@ export class MetricsService implements Metrics {
   private mailCounter: Counter;
 
   constructor() {
-    collectDefaultMetrics();
-
     this.mailCounter = new Counter({
       name: 'mail_requests',
       help: 'Total number of mail requests',

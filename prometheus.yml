@@ -1,0 +1,13 @@
+global: 
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'weather-app'
+    static_configs:
+      - targets: ['app:3000']
+    metrics_path: '/api/metrics'
+  
+  - job_name: 'mail'
+    static_configs:
+      - targets: ['mail:4001']
+    metrics_path: '/metrics'

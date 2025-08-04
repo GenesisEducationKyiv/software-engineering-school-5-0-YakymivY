@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
-import { AppController } from './app.controller';
 import { MailController } from './controllers/mail.controller';
 import { MailService } from './services/mail.service';
 import { MailBuilderService } from './services/mail-builder.service';
@@ -21,7 +20,7 @@ import { CommonModule } from './common/common.module';
     CommonModule,
     PrometheusModule.register(),
   ],
-  controllers: [MailController, MailEventController, AppController],
+  controllers: [MailController, MailEventController],
   providers: [
     { provide: 'Mailer', useClass: MailService },
     { provide: 'MailBuilder', useClass: MailBuilderService },
