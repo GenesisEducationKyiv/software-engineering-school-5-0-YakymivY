@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -11,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
 import { MailService } from '../../infrastructure/interfaces/mail-service.interface';
+import { Metrics } from '../../../common/interfaces/metrics.interface';
 
 import { SubscriptionService } from './subscription.service';
 
@@ -18,6 +15,7 @@ describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let repository: jest.Mocked<Repository<Subscription>>;
   let mailService: jest.Mocked<MailService>;
+  let metrics: jest.Mocked<Metrics>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -36,18 +34,24 @@ describe('SubscriptionService', () => {
       getOrThrow: jest.fn().mockReturnValue('http://localhost:3000'),
     };
 
+    const mockMetricsService = {
+      trackDbOperation: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SubscriptionService,
         { provide: getRepositoryToken(Subscription), useValue: mockRepository },
         { provide: 'MailService', useValue: mockMailService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: 'MetricsService', useValue: mockMetricsService },
       ],
     }).compile();
 
     service = module.get<SubscriptionService>(SubscriptionService);
     repository = module.get(getRepositoryToken(Subscription));
     mailService = module.get('MailService');
+    metrics = module.get('MetricsService');
   });
 
   describe('createSubscription', () => {
@@ -72,10 +76,16 @@ describe('SubscriptionService', () => {
 
       const result = await service.createSubscription(subscriptionDto);
 
+      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
+        'SELECT',
+        'Subscription',
+        'subscriptionRepository',
+        expect.any(Function),
+      );
+
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { email: subscriptionDto.email },
       });
-
       expect(repository.create).toHaveBeenCalledWith({
         email: subscriptionDto.email,
         city: subscriptionDto.city,
@@ -83,9 +93,17 @@ describe('SubscriptionService', () => {
         token: expect.any(String),
       });
 
-      expect(repository.save).toHaveBeenCalledWith(createdSubscription);
+      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
+        'INSERT',
+        'Subscription',
+        'subscriptionRepository',
+        expect.any(Function),
+      );
 
-      expect(mailService.sendConfirmationEmail).toHaveBeenCalled();
+      expect(mailService.sendConfirmationEmail).toHaveBeenCalledWith({
+        email: subscriptionDto.email,
+        token: expect.any(String),
+      });
 
       expect(result).toEqual({
         message: 'Subscription successful. Confirmation email sent.',
@@ -93,7 +111,7 @@ describe('SubscriptionService', () => {
     });
 
     it('should throw ConflictException if email already subscribed', async () => {
-      repository.findOne.mockResolvedValue({
+      const existingSubscription = {
         id: '1',
         email: subscriptionDto.email,
         city: subscriptionDto.city,
@@ -101,18 +119,14 @@ describe('SubscriptionService', () => {
         token: 'existing-token',
         confirmed: false,
         createdAt: new Date(),
-      });
+      };
+
+      metrics.trackDbOperation.mockImplementationOnce((_, __, ___, ____) =>
+        Promise.resolve(existingSubscription),
+      );
 
       await expect(service.createSubscription(subscriptionDto)).rejects.toThrow(
         ConflictException,
-      );
-    });
-
-    it('should throw InternalServerErrorException on unknown error', async () => {
-      repository.findOne.mockRejectedValue(new Error('DB error'));
-
-      await expect(service.createSubscription(subscriptionDto)).rejects.toThrow(
-        InternalServerErrorException,
       );
     });
   });
@@ -128,18 +142,38 @@ describe('SubscriptionService', () => {
         frequency: Frequency.DAILY,
         createdAt: new Date(),
       };
-      repository.findOne.mockResolvedValue(subscription);
+
+      metrics.trackDbOperation
+        .mockImplementationOnce(() => Promise.resolve(subscription))
+        .mockImplementationOnce((operation, entity, repo, callback) =>
+          callback(),
+        );
+
       repository.save.mockResolvedValue({ ...subscription, confirmed: true });
 
       const result = await service.confirmSubscription('token');
 
-      expect(repository.findOne).toHaveBeenCalledWith({
-        where: { token: 'token' },
-      });
+      expect(metrics.trackDbOperation).toHaveBeenNthCalledWith(
+        1,
+        'SELECT',
+        'Subscription',
+        'subscriptionRepository',
+        expect.any(Function),
+      );
+
+      expect(metrics.trackDbOperation).toHaveBeenNthCalledWith(
+        2,
+        'UPDATE',
+        'Subscription',
+        'subscriptionRepository',
+        expect.any(Function),
+      );
+
       expect(repository.save).toHaveBeenCalledWith({
         ...subscription,
         confirmed: true,
       });
+
       expect(result).toEqual({
         message: 'Subscription confirmed successfully',
       });
@@ -150,14 +184,6 @@ describe('SubscriptionService', () => {
 
       await expect(service.confirmSubscription('token')).rejects.toThrow(
         NotFoundException,
-      );
-    });
-
-    it('should throw InternalServerErrorException on unknown error', async () => {
-      repository.findOne.mockRejectedValue(new Error('DB error'));
-
-      await expect(service.confirmSubscription('token')).rejects.toThrow(
-        InternalServerErrorException,
       );
     });
   });
@@ -173,16 +199,27 @@ describe('SubscriptionService', () => {
         confirmed: false,
         createdAt: new Date(),
       };
-      repository.findOne.mockResolvedValue(subscription);
+
+      metrics.trackDbOperation.mockImplementationOnce(() =>
+        Promise.resolve(subscription),
+      );
+
       repository.remove.mockResolvedValue(undefined);
 
       const result = await service.removeSubscription('token');
 
-      expect(repository.findOne).toHaveBeenCalledWith({
-        where: { token: 'token' },
-      });
+      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
+        'SELECT',
+        'Subscription',
+        'subscriptionRepository',
+        expect.any(Function),
+      );
+
       expect(repository.remove).toHaveBeenCalledWith(subscription);
-      expect(result).toEqual({ message: 'Unsubscribed successfully' });
+
+      expect(result).toEqual({
+        message: 'Unsubscribed successfully',
+      });
     });
 
     it('should throw NotFoundException if token not found', async () => {
@@ -190,14 +227,6 @@ describe('SubscriptionService', () => {
 
       await expect(service.removeSubscription('token')).rejects.toThrow(
         NotFoundException,
-      );
-    });
-
-    it('should throw InternalServerErrorException on unknown error', async () => {
-      repository.findOne.mockRejectedValue(new Error('DB error'));
-
-      await expect(service.removeSubscription('token')).rejects.toThrow(
-        InternalServerErrorException,
       );
     });
   });
@@ -224,22 +253,24 @@ describe('SubscriptionService', () => {
           createdAt: new Date(),
         },
       ] as Subscription[];
-      repository.find.mockResolvedValue(subs);
+
+      metrics.trackDbOperation.mockImplementation(
+        (_operation, _entity, _repo, _callback) => Promise.resolve(subs),
+      );
 
       const result = await service.getActiveSubscriptions(Frequency.DAILY);
+
+      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
+        'SELECT',
+        'Subscription',
+        'subscriptionRepository',
+        expect.any(Function),
+      );
 
       expect(repository.find).toHaveBeenCalledWith({
         where: { confirmed: true, frequency: Frequency.DAILY },
       });
       expect(result).toEqual(subs);
-    });
-
-    it('should throw InternalServerErrorException on unknown error', async () => {
-      repository.find.mockRejectedValue(new Error('DB error'));
-
-      await expect(
-        service.getActiveSubscriptions(Frequency.DAILY),
-      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 });

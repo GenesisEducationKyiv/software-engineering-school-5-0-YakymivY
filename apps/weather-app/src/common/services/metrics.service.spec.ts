@@ -1,69 +1,99 @@
-import { Counter } from 'prom-client';
-import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Counter, Histogram } from 'prom-client';
 
 import { MetricsService } from './metrics.service';
 
 jest.mock('prom-client');
-jest.mock('@nestjs/common', () => ({
-  Logger: {
-    error: jest.fn(),
-  },
-}));
 
 describe('MetricsService', () => {
   let service: MetricsService;
-  let labelsMock: { inc: jest.Mock };
 
-  beforeEach(() => {
-    labelsMock = { inc: jest.fn() };
+  let cacheLabelsMock: jest.Mock;
+  let apiIncMock: jest.Mock;
+  let dbLabelsMock: jest.Mock;
+  let dbIncMock: jest.Mock;
+  let dbTimerStopMock: jest.Mock;
+  let dbTimerStartMock: jest.Mock;
 
-    // Mock the Counter constructor to return a mock object with .labels()
-    (Counter as jest.Mock).mockImplementation(() => ({
-      labels: jest.fn(() => labelsMock),
+  beforeEach(async () => {
+    cacheLabelsMock = jest.fn().mockReturnThis();
+    apiIncMock = jest.fn();
+    dbLabelsMock = jest.fn().mockReturnThis();
+    dbIncMock = jest.fn();
+    dbTimerStopMock = jest.fn();
+    dbTimerStartMock = jest.fn().mockReturnValue(dbTimerStopMock);
+
+    (Counter as jest.Mock).mockImplementation((opts) => {
+      switch (opts.name) {
+        case 'cache_requests':
+          return { labels: cacheLabelsMock, inc: jest.fn() };
+        case 'external_api_calls':
+          return { inc: apiIncMock };
+        case 'db_calls_total':
+          return { labels: dbLabelsMock, inc: dbIncMock };
+        default:
+          return {};
+      }
+    });
+
+    (Histogram as jest.Mock).mockImplementation(() => ({
+      labels: jest.fn().mockReturnThis(),
+      startTimer: dbTimerStartMock,
     }));
 
-    service = new MetricsService();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [MetricsService],
+    }).compile();
+
+    service = module.get<MetricsService>(MetricsService);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should increment the hit label', () => {
-    service.trackCacheRequest('hit');
-
-    expect(Counter).toHaveBeenCalledWith({
-      name: 'cache_requests',
-      help: 'Total number of cache requests',
-      labelNames: ['result'],
+  describe('trackCacheRequest', () => {
+    it('should increment cache counter for "hit"', () => {
+      service.trackCacheRequest('hit');
+      expect(cacheLabelsMock).toHaveBeenCalledWith('hit');
     });
 
-    expect(labelsMock.inc).toHaveBeenCalled();
-    expect(
-      (Counter as jest.Mock).mock.results[0].value.labels,
-    ).toHaveBeenCalledWith('hit');
+    it('should handle exception in cache counter', () => {
+      cacheLabelsMock.mockImplementation(() => {
+        throw new Error('Cache label error');
+      });
+
+      expect(() => service.trackCacheRequest('miss')).not.toThrow();
+    });
   });
 
-  it('should increment the miss label', () => {
-    service.trackCacheRequest('miss');
-
-    expect(labelsMock.inc).toHaveBeenCalled();
-    expect(
-      (Counter as jest.Mock).mock.results[0].value.labels,
-    ).toHaveBeenCalledWith('miss');
-  });
-
-  it('should catch and log error if labels throw', () => {
-    const error = new Error('Invalid label');
-    (Counter as jest.Mock).mockReturnValueOnce({
-      labels: jest.fn(() => {
-        throw error;
-      }),
+  describe('trackApiCall', () => {
+    it('should increment API call counter', () => {
+      service.trackApiCall();
+      expect(apiIncMock).toHaveBeenCalled();
     });
 
-    const failingService = new MetricsService();
-    failingService.trackCacheRequest('hit');
+    it('should handle exception in API call counter', () => {
+      apiIncMock.mockImplementation(() => {
+        throw new Error('API inc error');
+      });
 
-    expect(Logger.error).toHaveBeenCalledWith('Error recording metric:', error);
+      expect(() => service.trackApiCall()).not.toThrow();
+    });
+  });
+
+  describe('trackDbOperation', () => {
+    it('should time and increment DB call counter on success', async () => {
+      const mockDbCall = jest.fn().mockResolvedValue('result');
+
+      const result = await service.trackDbOperation(
+        'find',
+        'User',
+        'API',
+        mockDbCall,
+      );
+
+      expect(dbLabelsMock).toHaveBeenCalledWith('find', 'User', 'API');
+      expect(dbIncMock).toHaveBeenCalled();
+      expect(dbTimerStartMock).toHaveBeenCalled();
+      expect(dbTimerStopMock).toHaveBeenCalled();
+      expect(result).toBe('result');
+    });
   });
 });

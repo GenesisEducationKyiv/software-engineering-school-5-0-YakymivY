@@ -17,6 +17,10 @@ describe('MailBuilderService', () => {
     getOrThrow: jest.fn().mockReturnValue(BASE_URL),
   };
 
+  const mockMetricsService = {
+    trackMailRequest: jest.fn(),
+  };
+
   beforeEach(async () => {
     mockMailer = {
       sendMail: jest.fn(),
@@ -27,6 +31,7 @@ describe('MailBuilderService', () => {
         MailBuilderService,
         { provide: 'Mailer', useValue: mockMailer },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: 'MetricsService', useValue: mockMetricsService },
       ],
     }).compile();
 
