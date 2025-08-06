@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Counter, Histogram } from 'prom-client';
+import * as Prometheus from 'prom-client';
 
 import { Metrics } from '../interfaces/metrics.interface';
 
@@ -81,6 +82,18 @@ export class MetricsService implements Metrics {
       });
     } finally {
       timer();
+    }
+  }
+
+  public async getMetrics(): Promise<string> {
+    try {
+      return await Prometheus.register.metrics();
+    } catch (error) {
+      this.logger.error({
+        message: 'Error collecting metrics',
+        error: error.message,
+      });
+      throw new Error('Failed to collect metrics');
     }
   }
 }

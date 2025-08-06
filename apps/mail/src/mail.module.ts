@@ -7,6 +7,7 @@ import { MailService } from './services/mail.service';
 import { MailBuilderService } from './services/mail-builder.service';
 import { MailEventController } from './controllers/mail-event.controller';
 import { CommonModule } from './common/common.module';
+import { MetricsController } from './controllers/metrics.controller';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { CommonModule } from './common/common.module';
     CommonModule,
     PrometheusModule.register(),
   ],
-  controllers: [MailController, MailEventController],
+  controllers: [MailController, MailEventController, MetricsController],
   providers: [
     { provide: 'Mailer', useClass: MailService },
     { provide: 'MailBuilder', useClass: MailBuilderService },

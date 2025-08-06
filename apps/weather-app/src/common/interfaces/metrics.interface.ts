@@ -14,4 +14,5 @@ export interface Metrics {
     source: string,
     dbCall: () => Promise<T>,
   ): Promise<T>;
+  getMetrics(): Promise<string>;
 }
