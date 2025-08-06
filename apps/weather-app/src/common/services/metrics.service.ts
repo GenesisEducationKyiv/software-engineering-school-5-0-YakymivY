@@ -5,12 +5,12 @@ import { Metrics } from '../interfaces/metrics.interface';
 
 @Injectable()
 export class MetricsService implements Metrics {
-  private readonly logger = new Logger(MetricsService.name);
+  public readonly logger = new Logger(MetricsService.name);
 
   private cacheCounter: Counter;
   private apiCallsCounter: Counter;
-  private dbCallsCounter: Counter;
-  private dbCallDuration: Histogram;
+  public dbCallsCounter: Counter;
+  public dbCallDuration: Histogram;
 
   constructor() {
     this.cacheCounter = new Counter({

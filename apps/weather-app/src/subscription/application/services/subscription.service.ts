@@ -16,17 +16,26 @@ import { Subscription } from '../../domain/entities/subscription.entity';
 import { MailService } from '../../infrastructure/interfaces/mail-service.interface';
 import { SubscriptionHandler } from '../interfaces/subscription-handler.interface';
 import { Metrics } from '../../../common/interfaces/metrics.interface';
+import { wrapRepoWithMetrics } from '../../../common/utils/subscription/repo-metrics.proxy';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionHandler {
   private readonly logger = new Logger(SubscriptionService.name);
+  private readonly repoWithMetrics: Repository<Subscription>;
 
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
     @Inject('MailService') private readonly mailService: MailService,
     @Inject('MetricsService') private readonly metrics: Metrics,
-  ) {}
+  ) {
+    this.repoWithMetrics = wrapRepoWithMetrics(
+      this.subscriptionRepository,
+      this.metrics,
+      'Subscription',
+      'subscriptionRepository',
+    );
+  }
 
   async createSubscription(
     subscriptionDto: SubscriptionDto,
@@ -35,16 +44,9 @@ export class SubscriptionService implements SubscriptionHandler {
       const { email, city, frequency } = subscriptionDto;
 
       // check if the subscription already exists
-      const existingEmailOperation = this.subscriptionRepository.findOne({
+      const existingEmail = await this.repoWithMetrics.findOne({
         where: { email },
       });
-
-      const existingEmail = await this.metrics.trackDbOperation<Subscription>(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        () => existingEmailOperation,
-      );
 
       if (existingEmail) {
         this.logger.error({
@@ -65,12 +67,7 @@ export class SubscriptionService implements SubscriptionHandler {
         token,
       });
 
-      await this.metrics.trackDbOperation<Subscription>(
-        'INSERT',
-        'Subscription',
-        'subscriptionRepository',
-        () => this.subscriptionRepository.save(subscription),
-      );
+      await this.repoWithMetrics.save(subscription);
 
       await this.mailService.sendConfirmationEmail({
         email,
@@ -95,16 +92,9 @@ export class SubscriptionService implements SubscriptionHandler {
 
   async confirmSubscription(token: string): Promise<{ message: string }> {
     try {
-      const subscriptionOperation = this.subscriptionRepository.findOne({
+      const subscription = await this.repoWithMetrics.findOne({
         where: { token },
       });
-
-      const subscription = await this.metrics.trackDbOperation<Subscription>(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        () => subscriptionOperation,
-      );
 
       if (!subscription) {
         this.logger.error({
@@ -116,14 +106,7 @@ export class SubscriptionService implements SubscriptionHandler {
 
       // change status to confirmed
       subscription.confirmed = true;
-      await this.subscriptionRepository.save(subscription);
-
-      await this.metrics.trackDbOperation(
-        'UPDATE',
-        'Subscription',
-        'subscriptionRepository',
-        () => this.subscriptionRepository.save(subscription),
-      );
+      await this.repoWithMetrics.save(subscription);
 
       this.logger.log({
         userId: subscription.id,
@@ -148,16 +131,9 @@ export class SubscriptionService implements SubscriptionHandler {
 
   async removeSubscription(token: string): Promise<{ message: string }> {
     try {
-      const subscriptionOperation = this.subscriptionRepository.findOne({
+      const subscription = await this.repoWithMetrics.findOne({
         where: { token },
       });
-
-      const subscription = await this.metrics.trackDbOperation<Subscription>(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        () => subscriptionOperation,
-      );
 
       if (!subscription) {
         this.logger.error({
@@ -194,16 +170,9 @@ export class SubscriptionService implements SubscriptionHandler {
   async getActiveSubscriptions(frequency: Frequency): Promise<Subscription[]> {
     try {
       // get all confirmed subscriptions with provided frequency
-      const subscriptionsOperation = this.subscriptionRepository.find({
+      const subscriptions = await this.repoWithMetrics.find({
         where: { confirmed: true, frequency },
       });
-
-      const subscriptions = await this.metrics.trackDbOperation<Subscription[]>(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        () => subscriptionsOperation,
-      );
 
       this.logger.log({
         frequency,

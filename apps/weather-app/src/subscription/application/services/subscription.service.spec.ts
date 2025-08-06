@@ -7,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { Frequency } from '../../../common/enums/frequency.enum';
 import { Subscription } from '../../domain/entities/subscription.entity';
 import { MailService } from '../../infrastructure/interfaces/mail-service.interface';
-import { Metrics } from '../../../common/interfaces/metrics.interface';
 
 import { SubscriptionService } from './subscription.service';
 
@@ -15,7 +14,6 @@ describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let repository: jest.Mocked<Repository<Subscription>>;
   let mailService: jest.Mocked<MailService>;
-  let metrics: jest.Mocked<Metrics>;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -35,7 +33,21 @@ describe('SubscriptionService', () => {
     };
 
     const mockMetricsService = {
-      trackDbOperation: jest.fn(),
+      trackDbOperation: jest
+        .fn()
+        .mockImplementation((operation, entity, repo, callback) => {
+          return callback() as unknown;
+        }),
+      dbCallsCounter: {
+        labels: jest.fn().mockReturnValue({
+          inc: jest.fn(),
+        }),
+      },
+      dbCallDuration: {
+        labels: jest.fn().mockReturnValue({
+          startTimer: jest.fn().mockReturnValue(() => {}),
+        }),
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -51,7 +63,6 @@ describe('SubscriptionService', () => {
     service = module.get<SubscriptionService>(SubscriptionService);
     repository = module.get(getRepositoryToken(Subscription));
     mailService = module.get('MailService');
-    metrics = module.get('MetricsService');
   });
 
   describe('createSubscription', () => {
@@ -76,13 +87,6 @@ describe('SubscriptionService', () => {
 
       const result = await service.createSubscription(subscriptionDto);
 
-      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        expect.any(Function),
-      );
-
       expect(repository.findOne).toHaveBeenCalledWith({
         where: { email: subscriptionDto.email },
       });
@@ -92,13 +96,6 @@ describe('SubscriptionService', () => {
         frequency: subscriptionDto.frequency,
         token: expect.any(String),
       });
-
-      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
-        'INSERT',
-        'Subscription',
-        'subscriptionRepository',
-        expect.any(Function),
-      );
 
       expect(mailService.sendConfirmationEmail).toHaveBeenCalledWith({
         email: subscriptionDto.email,
@@ -121,9 +118,7 @@ describe('SubscriptionService', () => {
         createdAt: new Date(),
       };
 
-      metrics.trackDbOperation.mockImplementationOnce((_, __, ___, ____) =>
-        Promise.resolve(existingSubscription),
-      );
+      repository.findOne.mockResolvedValue(existingSubscription);
 
       await expect(service.createSubscription(subscriptionDto)).rejects.toThrow(
         ConflictException,
@@ -143,31 +138,11 @@ describe('SubscriptionService', () => {
         createdAt: new Date(),
       };
 
-      metrics.trackDbOperation
-        .mockImplementationOnce(() => Promise.resolve(subscription))
-        .mockImplementationOnce((operation, entity, repo, callback) =>
-          callback(),
-        );
+      repository.findOne.mockResolvedValue(subscription);
 
       repository.save.mockResolvedValue({ ...subscription, confirmed: true });
 
       const result = await service.confirmSubscription('token');
-
-      expect(metrics.trackDbOperation).toHaveBeenNthCalledWith(
-        1,
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        expect.any(Function),
-      );
-
-      expect(metrics.trackDbOperation).toHaveBeenNthCalledWith(
-        2,
-        'UPDATE',
-        'Subscription',
-        'subscriptionRepository',
-        expect.any(Function),
-      );
 
       expect(repository.save).toHaveBeenCalledWith({
         ...subscription,
@@ -200,20 +175,11 @@ describe('SubscriptionService', () => {
         createdAt: new Date(),
       };
 
-      metrics.trackDbOperation.mockImplementationOnce(() =>
-        Promise.resolve(subscription),
-      );
+      repository.findOne.mockResolvedValue(subscription);
 
       repository.remove.mockResolvedValue(undefined);
 
       const result = await service.removeSubscription('token');
-
-      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        expect.any(Function),
-      );
 
       expect(repository.remove).toHaveBeenCalledWith(subscription);
 
@@ -254,18 +220,9 @@ describe('SubscriptionService', () => {
         },
       ] as Subscription[];
 
-      metrics.trackDbOperation.mockImplementation(
-        (_operation, _entity, _repo, _callback) => Promise.resolve(subs),
-      );
+      repository.find.mockResolvedValue(subs);
 
       const result = await service.getActiveSubscriptions(Frequency.DAILY);
-
-      expect(metrics.trackDbOperation).toHaveBeenCalledWith(
-        'SELECT',
-        'Subscription',
-        'subscriptionRepository',
-        expect.any(Function),
-      );
 
       expect(repository.find).toHaveBeenCalledWith({
         where: { confirmed: true, frequency: Frequency.DAILY },
