@@ -88,7 +88,7 @@ describe('SubscriptionService', () => {
       const result = await service.createSubscription(subscriptionDto);
 
       expect(repository.findOne).toHaveBeenCalledWith({
-        where: { email: subscriptionDto.email },
+        where: { email: subscriptionDto.email, city: subscriptionDto.city },
       });
       expect(repository.create).toHaveBeenCalledWith({
         email: subscriptionDto.email,
@@ -103,7 +103,7 @@ describe('SubscriptionService', () => {
       });
 
       expect(result).toEqual({
-        message: 'Subscription successful. Confirmation email sent.',
+        message: 'Subscription created successfully. Confirmation email sent.',
       });
     });
 
