@@ -5,10 +5,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { DataSource, Repository } from 'typeorm';
 
-import { AppModule } from '../../src/app.module';
-import { Subscription } from '../../src/subscription/domain/entities/subscription.entity';
+import { AppModule } from '../../apps/weather-app/src/app.module';
+import { Subscription } from '../../apps/weather-app/src/subscription/domain/entities/subscription.entity';
 
-import { configureApp } from './configure-app';
+import { configureApp, resetDatabase } from './configure-app';
 
 describe('Subscription API', () => {
   let app: INestApplication;
@@ -77,11 +77,13 @@ describe('Subscription API', () => {
     await configureApp(app);
 
     dataSource = app.get(DataSource);
+    await resetDatabase(dataSource);
     subscriptionRepo = dataSource.getRepository(Subscription);
   });
 
   afterAll(async () => {
     if (app) await app.close();
+    if (dataSource && dataSource.isInitialized) await dataSource.destroy();
   });
 
   beforeEach(async () => {

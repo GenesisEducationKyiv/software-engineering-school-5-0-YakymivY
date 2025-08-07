@@ -74,4 +74,12 @@ module.exports = {
       },
     },
   ],
+  settings: {
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: ['./tsconfig.json', './apps/weather-app/tsconfig.app.json', './apps/mail/tsconfig.app.json'],
+      },
+    },
+  },
 };
