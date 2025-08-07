@@ -1,44 +1,64 @@
 import 'tsarch/dist/jest';
 import { filesOfProject } from 'tsarch';
 
-describe('Layered Architecture: Weather Module', () => {
-  const files = filesOfProject().inFolder('src/weather');
+interface ModuleConfig {
+  name: string;
+  path: string;
+}
 
-  it('domain should not depend on application, infrastructure or presentation', () => {
-    const rule = files
-      .inFolder('domain')
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder('application')
-      .inFolder('infrastructure')
-      .inFolder('presentation');
+const testModuleArchitecture = ({ name, path }: ModuleConfig) => {
+  describe(`Layered Architecture: ${name} Module`, () => {
+    const files = filesOfProject().inFolder(path);
 
-    expect(rule).toPassAsync();
+    it('domain layer should only depend on itself', () => {
+      const rule = files
+        .inFolder('domain')
+        .shouldNot()
+        .dependOnFiles()
+        .inFolder('application')
+        .inFolder('infrastructure')
+        .inFolder('presentation');
+
+      expect(rule).toPassAsync();
+    });
+
+    it('application layer should only depend on domain', () => {
+      const rule = files
+        .inFolder('application')
+        .shouldNot()
+        .dependOnFiles()
+        .inFolder('infrastructure')
+        .inFolder('presentation');
+
+      expect(rule).toPassAsync();
+    });
+
+    it('infrastructure layer should not depend on presentation', () => {
+      const rule = files
+        .inFolder('infrastructure')
+        .shouldNot()
+        .dependOnFiles()
+        .inFolder('presentation');
+
+      expect(rule).toPassAsync();
+    });
+
+    it('should be free of dependency cycles', () => {
+      const rule = files.should().beFreeOfCycles();
+      expect(rule).toPassAsync();
+    });
+  });
+};
+
+// Test each module
+describe('Architecture Tests', () => {
+  testModuleArchitecture({
+    name: 'Weather',
+    path: 'apps/weather-app/src',
   });
 
-  it('application should not depend on infrastructure or presentation', () => {
-    const rule = files
-      .inFolder('application')
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder('infrastructure')
-      .inFolder('presentation');
-
-    expect(rule).toPassAsync();
-  });
-
-  it('infrastructure should not depend on presentation', () => {
-    const rule = files
-      .inFolder('infrastructure')
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder('presentation');
-
-    expect(rule).toPassAsync();
-  });
-
-  it('each layer should be free of dependency cycles', () => {
-    const rule = files.should().beFreeOfCycles();
-    expect(rule).toPassAsync();
+  testModuleArchitecture({
+    name: 'Mail',
+    path: 'apps/mail/src',
   });
 });

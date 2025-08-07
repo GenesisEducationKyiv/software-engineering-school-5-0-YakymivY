@@ -1,12 +1,12 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { formEmailContent } from '../common/mail.utils';
-import { Mailer } from '../interfaces/mailer.interface';
-import { MailBuilder } from '../interfaces/mail-builder.interface';
-import { ConfirmationPayload } from '../interfaces/confirmation-payload.interface';
-import { WeatherPayload } from '../interfaces/weather-payload.interface';
-import { MetricsService } from '../common/services/metrics/metrics.service';
+import { formEmailContent } from '../../common/mail.utils';
+import { Mailer } from '../../infrastructure/interfaces/mailer.interface';
+import { MailBuilder } from '../../application/interfaces/mail-builder.interface';
+import { ConfirmationPayload } from '../../domain/interfaces/confirmation-payload.interface';
+import { WeatherPayload } from '../../domain/interfaces/weather-payload.interface';
+import { MetricsService } from '../../common/services/metrics/metrics.service';
 
 @Injectable()
 export class MailBuilderService implements MailBuilder {

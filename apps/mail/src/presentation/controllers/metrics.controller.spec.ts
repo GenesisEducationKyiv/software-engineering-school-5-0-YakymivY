@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { MetricsGuard } from '@app/common';
 
-import { Metrics } from '../common/interfaces/metrics.interface';
+import { Metrics } from '../../common/interfaces/metrics.interface';
 
 import { MetricsController } from './metrics.controller';
 
