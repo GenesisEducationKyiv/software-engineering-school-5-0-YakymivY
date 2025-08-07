@@ -1,6 +1,6 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "..",
   "testRegex": ".*\\.int-spec\\.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
@@ -13,5 +13,6 @@
   "preset": "ts-jest",
   "testEnvironment": "node",
   "verbose": true,
-  "testTimeout": 60000
+  "testTimeout": 60000,
+  "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
 }

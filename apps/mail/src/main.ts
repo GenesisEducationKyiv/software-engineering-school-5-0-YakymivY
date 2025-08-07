@@ -5,7 +5,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 
-import { winstonLoggerOptions } from '../../../logger.config';
+import { winstonLoggerOptions } from '../../../configs/logger.config';
 
 import { MailModule } from './mail.module';
 
