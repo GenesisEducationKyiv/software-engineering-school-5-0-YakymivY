@@ -24,7 +24,7 @@ test.describe('Static Page', () => {
     await page.click('button[type="submit"]');
 
     await expect(page.locator('pre')).toContainText(
-      'Subscription successful. Confirmation email sent.',
+      'Subscription created successfully. Confirmation email sent.',
     );
   });
 
