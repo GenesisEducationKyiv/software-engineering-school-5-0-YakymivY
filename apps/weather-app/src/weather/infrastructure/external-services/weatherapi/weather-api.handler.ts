@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   InternalServerErrorException,
@@ -9,6 +10,7 @@ import { lastValueFrom } from 'rxjs';
 
 import { WeatherResponse } from '../../../domain/entities/weather.interface';
 import { BaseWeatherHandler } from '../../chains/base-weather.handler';
+import { MetricsService } from '../../../../common/services/metrics.service';
 
 @Injectable()
 export class WeatherApiHandler extends BaseWeatherHandler {
@@ -17,6 +19,7 @@ export class WeatherApiHandler extends BaseWeatherHandler {
   constructor(
     private http: HttpService,
     private configService: ConfigService,
+    @Inject('MetricsService') private readonly metrics: MetricsService,
   ) {
     super();
     this.name = 'weatherapi.com';
@@ -28,6 +31,7 @@ export class WeatherApiHandler extends BaseWeatherHandler {
     try {
       const url = `https://api.weatherapi.com/v1/current.json?q=${city}&key=${this.weatherApiKey}`;
       const response = await lastValueFrom(this.http.get(url));
+      this.metrics.trackApiCall();
       const data = response.data as {
         current: {
           temp_c: number;

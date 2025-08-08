@@ -1,3 +1,3 @@
 export * from './types';
 export * from './filters';
-export * from './logger';
+export * from './guards';
