@@ -16,7 +16,7 @@ const config: Config = {
     '^@app/contracts/(.*)$': '<rootDir>/../../../libs/contracts/events/$1',
   },
   testEnvironment: 'node',
-  setupFiles: ['../../../jest.setup.ts'],
+  setupFiles: ['../../../configs/jest.setup.ts'],
 };
 
 export default config;

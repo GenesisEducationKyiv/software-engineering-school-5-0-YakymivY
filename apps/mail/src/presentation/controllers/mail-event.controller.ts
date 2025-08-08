@@ -3,7 +3,7 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 
 import { UserSubscribedEvent, WeatherUpdateEvent } from '@app/contracts';
 
-import { MailBuilder } from '../interfaces/mail-builder.interface';
+import { MailBuilder } from '../../application/interfaces/mail-builder.interface';
 
 @Controller('mail-event')
 export class MailEventController {

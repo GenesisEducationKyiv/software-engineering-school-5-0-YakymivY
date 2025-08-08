@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
-  testDir: './test/e2e',
+  testDir: '../test/e2e',
   testMatch: '**/*.spec.ts',
   timeout: 10000,
   retries: 0,

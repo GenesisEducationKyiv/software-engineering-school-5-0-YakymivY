@@ -5,7 +5,7 @@ import { WinstonModule } from 'nest-winston';
 
 import { HttpExceptionsFilter } from '@app/common';
 
-import { winstonLoggerOptions } from '../../../logger.config';
+import { winstonLoggerOptions } from '../../../configs/logger.config';
 
 import { AppModule } from './app.module';
 

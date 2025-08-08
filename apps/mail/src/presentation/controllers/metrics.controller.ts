@@ -2,7 +2,7 @@ import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 
 import { MetricsGuard } from '@app/common';
 
-import { Metrics } from '../common/interfaces/metrics.interface';
+import { Metrics } from '../../common/interfaces/metrics.interface';
 
 @Controller('metrics')
 export class MetricsController {

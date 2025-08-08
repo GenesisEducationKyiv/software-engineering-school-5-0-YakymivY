@@ -27,18 +27,60 @@ Before running the application, make sure you have the following installed:
 
 ## Environment Setup
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the weather-app directory with the following variables:
 
 ```env
+NODE_ENV=development
 BASE_URL=http://localhost:3000/api
-WEATHER_API_KEY=your_api_key (API key from https://weatherapi.com)
+
+WEATHER_API_KEY=apikey
+OPENWEATHERMAP_API_KEY=apikey
+METRICS_API_KEY=apikey
+
 DB_HOST=db
 DB_PORT=5432
-DB_USER=your_db_user
-DB_PASS=your_db_password
-DB_NAME=your_db_name
-MAIL_USER=email_address (Email address used to send updates)
-MAIL_PASS=email_app_pass (Password or app-specific password)
+DB_USER=db_user
+DB_PASS=db_pass
+DB_NAME=weather_app
+
+POSTGRES_USER=db_user
+POSTGRES_PASSWORD=db_pass
+POSTGRES_DB=weather_app
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASS=
+
+MAIL_USER=mail_user
+MAIL_PASS=mail_pass
+
+PROTO_PATH=../../proto/mail.proto
+MS_HOST=mail
+MS_PORT=4000
+
+RMQ_HOST=rabbitmq
+RMQ_PORT=5672
+RMQ_MGMT_PORT=15672
+RMQ_USER=rabbitmq_user
+RMQ_PASS=rabbitmq_pass
+```
+
+Create a `.env` file in the mail directory with the following variables:
+
+```env
+NODE_ENV=development
+BASE_URL=http://localhost:4000/api
+
+METRICS_API_KEY=apikey
+
+MAIL_USER=mail_user
+MAIL_PASS=mail_pass
+
+RMQ_HOST=rabbitmq
+RMQ_PORT=5672
+RMQ_USER=rabbitmq_user
+RMQ_PASS=rabbitmq_pass
 ```
 
 ## Running the Application
@@ -56,35 +98,13 @@ This will:
 - Start a PostgreSQL database
 - Run database migrations
 - Start the application server
+- Start the mail server
+- Start the RabbitMQ server
+- Start the Prometheus server
+- Start Redis instance
 
-The application will be available at `http://localhost:3000`
-
-### Running Locally
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Run database migrations:
-
-```bash
-npm run migration:run
-```
-
-3. Start the development server:
-
-```bash
-npm run start:dev
-```
-
-For production:
-
-```bash
-npm run build
-npm run start:prod
-```
+The weather-app will be available at `http://localhost:3000`
+The mail microservice will be available at `http://localhost:4000`
 
 ## Development
 
@@ -92,32 +112,35 @@ npm run start:prod
 
 - `npm run build` - Build the application
 - `npm run start:dev` - Start development server with hot-reload
+- `npm run start:debug` - Start development server in debug mode
 - `npm run start:prod` - Start production server
-- `npm run test` - Run unit tests
+- `npm run start:mail` - Start the mail microservice
+- `npm run start:weather-app` - Start the weather app service
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues
+- `npm run format` - Format code with Prettier
+- `npm run test` - Run all tests (both mail and weather-app)
+- `npm run test:mail` - Run mail service tests
+- `npm run test:weather-app` - Run weather app tests
+- `npm run test:integration` - Run integration tests
 - `npm run test:e2e` - Run end-to-end tests
-- `npm run migration:generate` - Generate new migration
+- `npm test:arch` - Run architecture tests
+- `npm run migration:generate` - Generate new database migration
 - `npm run migration:run` - Run pending migrations
 - `npm run migration:revert` - Revert last migration
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
+- `npm run proto:generate` - Generate TypeScript types from protobuf
+
+#### Test Environment Management
+
+- `npm run test:integration:start` - Start test containers
+- `npm run test:integration:start:git` - Start test containers for CI
+- `npm run test:integration:stop` - Stop test containers
+- `npm run test:e2e:start` - Start end-to-end test environment
+- `npm run test:e2e:stop` - Stop end-to-end test environment
 
 ## API Documentation
 
 The API documentation will be available at `http://localhost:3000/api` when the server is running.
-
-## Testing
-
-Run the test suite:
-
-```bash
-npm run test
-```
-
-For test coverage:
-
-```bash
-npm run test:cov
-```
 
 ## Contributing
 

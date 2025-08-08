@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { SendWeatherUpdateEmailRequest } from '@app/common';
 
-import { Mailer } from '../interfaces/mailer.interface';
+import { Mailer } from '../../infrastructure/interfaces/mailer.interface';
 
 import { MailBuilderService } from './mail-builder.service';
 

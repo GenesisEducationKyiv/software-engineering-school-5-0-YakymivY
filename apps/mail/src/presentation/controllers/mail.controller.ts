@@ -9,7 +9,7 @@ import {
   SendWeatherUpdateEmailResponse,
 } from '@app/common';
 
-import { MailBuilder } from '../interfaces/mail-builder.interface';
+import { MailBuilder } from '../../application/interfaces/mail-builder.interface';
 
 @Controller()
 @MailServiceControllerMethods()

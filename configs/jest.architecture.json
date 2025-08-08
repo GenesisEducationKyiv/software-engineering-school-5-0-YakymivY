@@ -5,6 +5,6 @@
   "testMatch": ["**/test/architecture/**/*.spec.ts"],
   "setupFilesAfterEnv": ["tsarch/dist/jest"],
   "moduleFileExtensions": ["ts", "js", "json"],
-  "roots": ["<rootDir>/test/architecture"],
+  "roots": ["<rootDir>/../test/architecture"],
   "testTimeout": 60000
 }

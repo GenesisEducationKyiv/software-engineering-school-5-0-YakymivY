@@ -44,17 +44,18 @@ export class SubscriptionService implements SubscriptionHandler {
       const { email, city, frequency } = subscriptionDto;
 
       // check if the subscription already exists
-      const existingEmail = await this.repoWithMetrics.findOne({
-        where: { email },
+      const existingSubscription = await this.repoWithMetrics.findOne({
+        where: { email, city },
       });
 
-      if (existingEmail) {
+      if (existingSubscription) {
         this.logger.error({
-          userId: existingEmail.id,
-          email: existingEmail.email,
-          message: 'Email already subscribed',
+          userId: existingSubscription.id,
+          email: existingSubscription.email,
+          city: existingSubscription.city,
+          message: 'Subscription already exists',
         });
-        throw new ConflictException('Email already subscribed');
+        throw new ConflictException('Subscription already exists');
       }
 
       const token = uuidv4(); // generate a unique token
@@ -75,7 +76,7 @@ export class SubscriptionService implements SubscriptionHandler {
       });
 
       return {
-        message: 'Subscription successful. Confirmation email sent.',
+        message: 'Subscription created successfully. Confirmation email sent.',
       };
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -83,6 +84,7 @@ export class SubscriptionService implements SubscriptionHandler {
       }
       this.logger.error({
         email: subscriptionDto.email,
+        city: subscriptionDto.city,
         message: 'Error creating subscription',
         error,
       });

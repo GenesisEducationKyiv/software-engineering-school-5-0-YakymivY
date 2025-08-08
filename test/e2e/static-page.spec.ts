@@ -24,7 +24,7 @@ test.describe('Static Page', () => {
     await page.click('button[type="submit"]');
 
     await expect(page.locator('pre')).toContainText(
-      'Subscription successful. Confirmation email sent.',
+      'Subscription created successfully. Confirmation email sent.',
     );
   });
 
@@ -37,6 +37,8 @@ test.describe('Static Page', () => {
     await page.selectOption('select[name="frequency"]', 'hourly');
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('pre')).toContainText('Email already subscribed');
+    await expect(page.locator('pre')).toContainText(
+      'Subscription already exists',
+    );
   });
 });
