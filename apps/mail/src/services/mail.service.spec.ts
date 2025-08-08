@@ -23,10 +23,6 @@ describe('MailService', () => {
     }),
   };
 
-  const mockMetricsService = {
-    trackMailRequest: jest.fn(),
-  };
-
   beforeEach(async () => {
     (nodemailer.createTransport as jest.Mock).mockReturnValue(mockTransporter);
 
@@ -37,7 +33,6 @@ describe('MailService', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
-        { provide: 'MetricsService', useValue: mockMetricsService },
       ],
     }).compile();
 

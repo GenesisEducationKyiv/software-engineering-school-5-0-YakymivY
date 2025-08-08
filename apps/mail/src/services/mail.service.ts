@@ -43,12 +43,7 @@ export class MailService implements Mailer {
         html,
       });
     } catch (error) {
-      this.logger.error({
-        to,
-        subject,
-        message: 'Error occured when sending mail through SMTP',
-        error,
-      });
+      this.logger.error('Error sending mail: ', (error as Error).message);
       throw new InternalServerErrorException('Failed to send mail');
     }
   }

@@ -15,27 +15,16 @@ import { SubscriptionDto } from '../dtos/subscription.dto';
 import { Subscription } from '../../domain/entities/subscription.entity';
 import { MailService } from '../../infrastructure/interfaces/mail-service.interface';
 import { SubscriptionHandler } from '../interfaces/subscription-handler.interface';
-import { Metrics } from '../../../common/interfaces/metrics.interface';
-import { wrapRepoWithMetrics } from '../../../common/utils/subscription/repo-metrics.proxy';
 
 @Injectable()
 export class SubscriptionService implements SubscriptionHandler {
   private readonly logger = new Logger(SubscriptionService.name);
-  private readonly repoWithMetrics: Repository<Subscription>;
 
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
     @Inject('MailService') private readonly mailService: MailService,
-    @Inject('MetricsService') private readonly metrics: Metrics,
-  ) {
-    this.repoWithMetrics = wrapRepoWithMetrics(
-      this.subscriptionRepository,
-      this.metrics,
-      'Subscription',
-      'subscriptionRepository',
-    );
-  }
+  ) {}
 
   async createSubscription(
     subscriptionDto: SubscriptionDto,
@@ -44,16 +33,11 @@ export class SubscriptionService implements SubscriptionHandler {
       const { email, city, frequency } = subscriptionDto;
 
       // check if the subscription already exists
-      const existingEmail = await this.repoWithMetrics.findOne({
+      const existingEmail = await this.subscriptionRepository.findOne({
         where: { email },
       });
 
       if (existingEmail) {
-        this.logger.error({
-          userId: existingEmail.id,
-          email: existingEmail.email,
-          message: 'Email already subscribed',
-        });
         throw new ConflictException('Email already subscribed');
       }
 
@@ -67,7 +51,7 @@ export class SubscriptionService implements SubscriptionHandler {
         token,
       });
 
-      await this.repoWithMetrics.save(subscription);
+      await this.subscriptionRepository.save(subscription);
 
       await this.mailService.sendConfirmationEmail({
         email,
@@ -81,38 +65,25 @@ export class SubscriptionService implements SubscriptionHandler {
       if (error instanceof ConflictException) {
         throw error;
       }
-      this.logger.error({
-        email: subscriptionDto.email,
-        message: 'Error creating subscription',
-        error,
-      });
+      this.logger.error('Error creating subscription: ', error);
       throw new InternalServerErrorException('Failed to create subscription');
     }
   }
 
   async confirmSubscription(token: string): Promise<{ message: string }> {
     try {
-      const subscription = await this.repoWithMetrics.findOne({
+      // find the subscription
+      const subscription = await this.subscriptionRepository.findOne({
         where: { token },
       });
 
       if (!subscription) {
-        this.logger.error({
-          token,
-          message: 'Token not found for confirmation',
-        });
         throw new NotFoundException('Token not found');
       }
 
       // change status to confirmed
       subscription.confirmed = true;
-      await this.repoWithMetrics.save(subscription);
-
-      this.logger.log({
-        userId: subscription.id,
-        email: subscription.email,
-        message: 'Subscription confirmed successfully',
-      });
+      await this.subscriptionRepository.save(subscription);
 
       return {
         message: 'Subscription confirmed successfully',
@@ -121,36 +92,24 @@ export class SubscriptionService implements SubscriptionHandler {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error({
-        message: 'Error confirming subscription',
-        error,
-      });
+      this.logger.error('Error confirming subscription: ', error);
       throw new InternalServerErrorException('Failed to confirm subscription');
     }
   }
 
   async removeSubscription(token: string): Promise<{ message: string }> {
     try {
-      const subscription = await this.repoWithMetrics.findOne({
+      // find the subscription
+      const subscription = await this.subscriptionRepository.findOne({
         where: { token },
       });
 
       if (!subscription) {
-        this.logger.error({
-          token,
-          message: 'Token not found for removal',
-        });
         throw new NotFoundException('Token not found');
       }
 
       // delete the subscription from db
       await this.subscriptionRepository.remove(subscription);
-
-      this.logger.log({
-        userId: subscription.id,
-        email: subscription.email,
-        message: 'Unsubscribed successfully',
-      });
 
       return {
         message: 'Unsubscribed successfully',
@@ -159,10 +118,7 @@ export class SubscriptionService implements SubscriptionHandler {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error({
-        message: 'Error removing subscription',
-        error,
-      });
+      this.logger.error('Error removing subscription: ', error);
       throw new InternalServerErrorException('Failed to remove subscription');
     }
   }
@@ -170,23 +126,13 @@ export class SubscriptionService implements SubscriptionHandler {
   async getActiveSubscriptions(frequency: Frequency): Promise<Subscription[]> {
     try {
       // get all confirmed subscriptions with provided frequency
-      const subscriptions = await this.repoWithMetrics.find({
+      const subscriptions = await this.subscriptionRepository.find({
         where: { confirmed: true, frequency },
-      });
-
-      this.logger.log({
-        frequency,
-        message: 'Active subscriptions retrieved successfully',
-        subscriptions,
       });
 
       return subscriptions;
     } catch (error) {
-      this.logger.error({
-        frequency,
-        message: 'Error getting active subscriptions',
-        error,
-      });
+      this.logger.error('Error getting active subscriptions: ', error);
       throw new InternalServerErrorException(
         'Failed to get active subscriptions',
       );

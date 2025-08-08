@@ -1,13 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
+
+import { consoleLogger } from '@app/common';
 
 import { Caching } from '../interfaces/caching.interface';
 
 @Injectable()
 export class CachingService implements Caching {
-  private readonly logger = new Logger(CachingService.name);
-
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
   public async get<T>(key: string): Promise<T | null> {
@@ -18,11 +18,7 @@ export class CachingService implements Caching {
       }
       return null;
     } catch (error) {
-      this.logger.error({
-        key,
-        message: 'Error getting cache',
-        error,
-      });
+      consoleLogger.error('Error getting cache:', error);
       return null;
     }
   }
@@ -31,11 +27,7 @@ export class CachingService implements Caching {
     try {
       await this.redis.set(key, JSON.stringify(value), 'EX', ttl);
     } catch (error) {
-      this.logger.error({
-        key,
-        message: 'Error setting cache',
-        error,
-      });
+      consoleLogger.error('Error setting cache:', error);
     }
   }
 }

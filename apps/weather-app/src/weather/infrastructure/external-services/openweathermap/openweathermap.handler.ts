@@ -2,7 +2,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Inject,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
@@ -10,7 +9,6 @@ import { HttpService } from '@nestjs/axios';
 
 import { WeatherResponse } from '../../../domain/entities/weather.interface';
 import { BaseWeatherHandler } from '../../chains/base-weather.handler';
-import { MetricsService } from '../../../../common/services/metrics.service';
 
 @Injectable()
 export class OpenWeatherMapHandler extends BaseWeatherHandler {
@@ -19,7 +17,6 @@ export class OpenWeatherMapHandler extends BaseWeatherHandler {
   constructor(
     private http: HttpService,
     private configService: ConfigService,
-    @Inject('MetricsService') private readonly metrics: MetricsService,
   ) {
     super();
     this.openWeatherApiKey = this.configService.getOrThrow<string>(
@@ -32,7 +29,6 @@ export class OpenWeatherMapHandler extends BaseWeatherHandler {
     try {
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.openWeatherApiKey}`;
       const response = await lastValueFrom(this.http.get(url));
-      this.metrics.trackApiCall();
       const data = response.data as {
         main: {
           temp: number;

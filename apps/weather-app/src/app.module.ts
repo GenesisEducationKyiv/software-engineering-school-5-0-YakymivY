@@ -36,12 +36,7 @@ import { CommonModule } from './common/common.module';
       }),
       inject: [ConfigService],
     }),
-    PrometheusModule.register({
-      defaultMetrics: {
-        enabled: true,
-      },
-      path: '',
-    }),
+    PrometheusModule.register(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       exclude: ['/api*'],
