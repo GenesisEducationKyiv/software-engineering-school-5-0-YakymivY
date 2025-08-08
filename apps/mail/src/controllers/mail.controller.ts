@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Inject, Controller } from '@nestjs/common';
 
 import {
   MailServiceController,
@@ -9,12 +9,15 @@ import {
   SendWeatherUpdateEmailResponse,
 } from '@app/common';
 
-import { MailBuilderService } from '../services/mail-builder.service';
+import { MailBuilder } from '../interfaces/mail-builder.interface';
 
 @Controller()
 @MailServiceControllerMethods()
 export class MailController implements MailServiceController {
-  constructor(private readonly mailBuilderService: MailBuilderService) {}
+  constructor(
+    @Inject('MailBuilder')
+    private readonly mailBuilderService: MailBuilder,
+  ) {}
 
   async sendConfirmationEmail(
     confirmationData: SendConfirmationEmailRequest,

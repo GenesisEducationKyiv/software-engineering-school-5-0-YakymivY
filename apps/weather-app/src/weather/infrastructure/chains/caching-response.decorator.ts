@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { CachingService } from '../../../common/services/caching.service';
 import { WeatherProvider } from '../../domain/interfaces/weather-provider.interface';
@@ -9,8 +9,8 @@ import { MetricsService } from '../../../common/services/metrics.service';
 export class CachingResponseDecorator implements WeatherProvider {
   constructor(
     private readonly weatherProvider: WeatherProvider,
-    private readonly cachingService: CachingService,
-    private readonly metrics: MetricsService,
+    @Inject('CachingService') private readonly cachingService: CachingService,
+    @Inject('MetricsService') private readonly metrics: MetricsService,
   ) {}
 
   public getProviderName(): string {

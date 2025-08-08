@@ -1,16 +1,14 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import {
-  SendConfirmationEmailRequest,
-  SendWeatherUpdateEmailRequest,
-} from '@app/common';
-
 import { formEmailContent } from '../common/mail.utils';
 import { Mailer } from '../interfaces/mailer.interface';
+import { MailBuilder } from '../interfaces/mail-builder.interface';
+import { ConfirmationPayload } from '../interfaces/confirmation-payload.interface';
+import { WeatherPayload } from '../interfaces/weather-payload.interface';
 
 @Injectable()
-export class MailBuilderService {
+export class MailBuilderService implements MailBuilder {
   private readonly logger = new Logger(MailBuilderService.name);
   private readonly baseUrl: string;
 
@@ -22,7 +20,7 @@ export class MailBuilderService {
   }
 
   async sendConfirmationEmail(
-    confirmationData: SendConfirmationEmailRequest,
+    confirmationData: ConfirmationPayload,
   ): Promise<boolean> {
     const { email, token } = confirmationData;
     try {
@@ -38,9 +36,7 @@ export class MailBuilderService {
     }
   }
 
-  async sendWeatherUpdateEmail(
-    weatherData: SendWeatherUpdateEmailRequest,
-  ): Promise<boolean> {
+  async sendWeatherUpdateEmail(weatherData: WeatherPayload): Promise<boolean> {
     const { weather, subscription } = weatherData;
     try {
       await this.mailer.sendMail(
