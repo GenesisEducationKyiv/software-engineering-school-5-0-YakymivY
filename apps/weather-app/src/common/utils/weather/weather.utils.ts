@@ -1,7 +1,7 @@
-import { Logger } from '@nestjs/common';
+import { fileLogger } from '@app/common';
 
 import { WeatherResponse } from '../../../weather/domain/entities/weather.interface';
 
 export function logResponse(provider: string, response: WeatherResponse): void {
-  Logger.log(`${provider}: ${JSON.stringify(response)}`);
+  fileLogger.info(`${provider}: ${JSON.stringify(response)}`);
 }

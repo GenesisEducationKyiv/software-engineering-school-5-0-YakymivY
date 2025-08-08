@@ -3,16 +3,11 @@ import { join } from 'path';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { WinstonModule } from 'nest-winston';
-
-import { winstonLoggerOptions } from '../../../logger.config';
 
 import { MailModule } from './mail.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(MailModule, {
-    logger: WinstonModule.createLogger(winstonLoggerOptions),
-  });
+  const app = await NestFactory.create(MailModule);
   const configService = app.get(ConfigService);
 
   const rabbitHost = configService.get<string>('RABBITMQ_HOST');
@@ -49,7 +44,5 @@ async function bootstrap(): Promise<void> {
     },
   });
   await app.startAllMicroservices();
-
-  await app.listen(process.env.PORT ?? 4001);
 }
 void bootstrap();

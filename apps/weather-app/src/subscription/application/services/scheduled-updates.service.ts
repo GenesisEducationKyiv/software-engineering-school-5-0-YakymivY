@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { Frequency } from '../../../common/enums/frequency.enum';
@@ -10,8 +10,6 @@ import { SubscriptionService } from './subscription.service';
 
 @Injectable()
 export class ScheduledUpdatesService {
-  private readonly logger = new Logger(ScheduledUpdatesService.name);
-
   constructor(
     @Inject('SubscriptionService')
     private readonly subscriptionService: SubscriptionService,
@@ -21,9 +19,6 @@ export class ScheduledUpdatesService {
 
   @Cron(CronExpression.EVERY_HOUR)
   async sendHourlyUpdates(): Promise<void> {
-    this.logger.log({
-      message: 'Hourly updates requested successfully',
-    });
     const subscriptions: Subscription[] =
       await this.subscriptionService.getActiveSubscriptions(Frequency.HOURLY);
     await this.sendScheduledEmails(subscriptions);
@@ -31,9 +26,6 @@ export class ScheduledUpdatesService {
 
   @Cron(CronExpression.EVERY_DAY_AT_10AM)
   async sendDailyUpdates(): Promise<void> {
-    this.logger.log({
-      message: 'Daily updates requested successfully',
-    });
     const subscriptions: Subscription[] =
       await this.subscriptionService.getActiveSubscriptions(Frequency.DAILY);
     await this.sendScheduledEmails(subscriptions);
@@ -49,13 +41,6 @@ export class ScheduledUpdatesService {
       await this.mailService.sendWeatherUpdateEmail({
         weather,
         subscription,
-      });
-
-      this.logger.log({
-        userId: subscription.id,
-        email: subscription.email,
-        city: subscription.city,
-        message: 'Weather update email requested successfully',
       });
     }
   }

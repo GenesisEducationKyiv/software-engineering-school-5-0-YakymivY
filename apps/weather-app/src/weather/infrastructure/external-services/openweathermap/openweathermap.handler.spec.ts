@@ -28,7 +28,6 @@ describe('OpenWeatherMapHandler', () => {
         OpenWeatherMapHandler,
         { provide: HttpService, useValue: httpService },
         { provide: ConfigService, useValue: configService },
-        { provide: 'MetricsService', useValue: { trackApiCall: jest.fn() } },
       ],
     }).compile();
 
