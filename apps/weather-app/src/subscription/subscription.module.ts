@@ -11,6 +11,7 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { WeatherModule } from '../weather/weather.module';
+import { CommonModule } from '../common/common.module';
 
 import { SubscriptionService } from './application/services/subscription.service';
 import { SubscriptionController } from './presentation/controllers/subscription.controller';
@@ -25,6 +26,7 @@ import { MailEventService } from './infrastructure/services/mail-event.service';
     TypeOrmModule.forFeature([Subscription]),
     forwardRef(() => WeatherModule),
     HttpModule,
+    CommonModule,
     ClientsModule.registerAsync([
       // gRPC client
       {

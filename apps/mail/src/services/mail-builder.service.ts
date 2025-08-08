@@ -6,6 +6,7 @@ import { Mailer } from '../interfaces/mailer.interface';
 import { MailBuilder } from '../interfaces/mail-builder.interface';
 import { ConfirmationPayload } from '../interfaces/confirmation-payload.interface';
 import { WeatherPayload } from '../interfaces/weather-payload.interface';
+import { MetricsService } from '../common/services/metrics/metrics.service';
 
 @Injectable()
 export class MailBuilderService implements MailBuilder {
@@ -15,6 +16,7 @@ export class MailBuilderService implements MailBuilder {
   constructor(
     @Inject('Mailer') private readonly mailer: Mailer,
     private configService: ConfigService,
+    @Inject('MetricsService') private metricsService: MetricsService,
   ) {
     this.baseUrl = this.configService.getOrThrow<string>('BASE_URL');
   }
@@ -29,9 +31,14 @@ export class MailBuilderService implements MailBuilder {
         'Weather Subscription',
         `<p>Thanks for subscribing!</p><p>Click the link below to confirm:</p><a href="${this.baseUrl}/confirm/${token}">Confirm Subscription</a>`,
       );
+      this.metricsService.trackMailRequest('confirm');
       return true;
     } catch (error) {
-      this.logger.error('Error sending confirmation email: ', error);
+      this.logger.error({
+        email,
+        message: 'Error sending confirmation email',
+        error,
+      });
       return false;
     }
   }
@@ -44,9 +51,15 @@ export class MailBuilderService implements MailBuilder {
         'Weather Update',
         formEmailContent(weather, subscription.city, subscription.token),
       );
+      this.metricsService.trackMailRequest('weather');
       return true;
     } catch (error) {
-      this.logger.error('Error sending weather update email: ', error);
+      this.logger.error({
+        email: subscription.email,
+        city: subscription.city,
+        message: 'Error sending weather update email',
+        error,
+      });
       return false;
     }
   }

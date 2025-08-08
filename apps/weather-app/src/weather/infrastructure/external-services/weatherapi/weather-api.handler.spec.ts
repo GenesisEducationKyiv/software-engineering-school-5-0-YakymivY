@@ -27,6 +27,7 @@ describe('WeatherApiHandler', () => {
         WeatherApiHandler,
         { provide: HttpService, useValue: mockHttpService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: 'MetricsService', useValue: { trackApiCall: jest.fn() } },
       ],
     }).compile();
 

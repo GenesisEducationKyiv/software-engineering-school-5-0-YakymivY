@@ -23,6 +23,6 @@ COPY proto ./proto
 
 RUN chmod +x ./entrypoint.sh
 
-EXPOSE 4000
+EXPOSE 4000 4001
 
 ENTRYPOINT ["./entrypoint.sh"]

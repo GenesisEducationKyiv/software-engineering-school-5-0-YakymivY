@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { CachingService } from './services/caching.service';
 import { MetricsService } from './services/metrics.service';
+import { MetricsController } from './controllers/metrics.controller';
 
 @Module({
   imports: [
@@ -26,5 +27,6 @@ import { MetricsService } from './services/metrics.service';
     { provide: 'MetricsService', useClass: MetricsService },
   ],
   exports: ['CachingService', 'MetricsService'],
+  controllers: [MetricsController],
 })
 export class CommonModule {}
