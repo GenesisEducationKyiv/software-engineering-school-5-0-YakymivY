@@ -1,0 +1,18 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testRegex": ".*\\.int-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+    "^@app/contracts(|/.*)$": "<rootDir>/libs/contracts/events/$1"
+  },
+  "setupFiles": ["<rootDir>/test/integration/setup.ts"],
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "verbose": true,
+  "testTimeout": 60000,
+  "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
+}

@@ -1,0 +1,78 @@
+name: Unit, Integration & E2E Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      test_db:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: weather_app_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        options: >-
+          --health-cmd="pg_isready -U test_user -d weather_app_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      # --- Unit Tests ---
+      - name: Run unit tests
+        run: npm run test
+
+      # --- Integration Tests ---
+      - name: Start test containers
+        run: npm run test:integration:start:git
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          DB_USER: test_user
+          DB_PASS: test_pass
+          DB_NAME: weather_app_test
+          DB_HOST: localhost
+          NODE_ENV: test
+
+      - name: Stop test containers
+        run: npm run test:integration:stop
+
+      # --- E2E Tests ---
+      - name: Install Playwright and Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start test containers
+        run: npm run test:e2e:start
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          DB_USER: test_user
+          DB_PASS: test_pass
+          DB_NAME: weather_app_test
+          DB_HOST: test_db
+          NODE_ENV: test
+
+      - name: Stop test containers
+        run: npm run test:e2e:stop
+
+      # --- Architecture Tests ---
+      - name: Run architecture tests
+        run: npm run test:arch
+        
